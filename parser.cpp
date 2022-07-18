@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include <cstdio>
 #include <iterator>
 #include <sstream>
 
@@ -13,10 +14,6 @@ static std::string trim(const std::string& str)
     size_t last = str.find_last_not_of(' ');
     return str.substr(first, (last - first + 1));
 }
-
-
-
-
 
 bool is_semicolon(std::string str) {
   if (str.back() == ';')
@@ -48,22 +45,20 @@ void parser ::check_for_error(void) {
     else if (state == 5 && trim(line).size() == 0)
       continue ;
     else if (state == 5)
-		{
-			std::cout << "missing ;  at" << line << std::endl;
-			exit(1);
-		}
+			throw  std::runtime_error( "missing ;  at" );
     state = 5;
   }
   if (bracket_state != 0) {
-    std::cout << "Error in config file" << std::endl;
-    exit(1);
+	std::runtime_error( "Error in config file");
   }
 }
-
 void parser::get_server_fields(void) {
+
+
+  server_info     server;
+  location_info   location;
   config_file_fd.clear();
   config_file_fd.seekg(0, std::ios::beg);
-
   std::string line;
   getline(config_file_fd, line);
   std::string field;
@@ -80,32 +75,31 @@ void parser::get_server_fields(void) {
 			getline(ss, value, ';');
 			config_map[field] = trim(value);
 		}
-
 	  else if (field == "location")
 		{
-			//8 come from len of location
-			 std::cout << trim(line.substr( line.find("location") + 8 )) << std::endl;
-				getline(ss, value, '{');
-				std::cout << value << std::endl;
+					// 
+			std::cout << trim(line.substr( line.find("location") + 8 )) << std::endl;
+			getline(ss, value, '{');
+			std::cout << trim(value) << std::endl;
+			location.root = trim(value); 
+			while(getline(config_file_fd,line)) 
+			{
+				if(line.find("}") != std::string::npos)
+					break;
+					ss = std::istringstream((std::string(line)));
+				while (getline(ss, field, ' ')) 
+				{
+					getline (ss, field, ';');
+				std::cout <<  trim(field) << std::endl;
+				}
+			}
 		}
-		
     }
   }
   if ((field_list.size() == config_map.size()) || (field_list.size() != config_map.size() && config_map["server_name"] == ""))
 		config_maps.push_back(config_map);
   else 
-	{
-    std::cout << "Error in config file" << std::endl;
-    exit(1);
-  }
-
-
-
-
-
-
-
-
+	throw std::runtime_error("Error in config file");
 }
 
 parser::parser(char *str) {
@@ -115,7 +109,7 @@ parser::parser(char *str) {
   this->config_file_fd.open(str);
   if (this->config_file_fd.fail()) {
     std::cout << "Error opening file open(): " << str << std::endl;
-    exit(1);
+	throw std::runtime_error("Error opening file");
   }
 }
 
@@ -130,7 +124,7 @@ parser::parser(const parser &src) {
   this->config_file_fd.open(src.path);
   if (this->config_file_fd.fail()) {
     std::cout << "Error opening file open(): " << src.path << std::endl;
-    exit(1);
+	throw std::runtime_error("Error opening file");
   }
 }
 std::string parser::get_server_path(void) { return (this->path); }
