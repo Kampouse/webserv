@@ -5,6 +5,7 @@
 # include <map>
 # include <set>
 # include <vector>
+# include "./config_structs.hpp"
 class parser
 {
 	private:
