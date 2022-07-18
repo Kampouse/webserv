@@ -79,13 +79,16 @@ void parser::get_server_fields(void) {
 		{
 			getline(ss, value, ';');
 			config_map[field] = trim(value);
-			std::cout << field << "(" << trim(value) << ")" <<  std::endl;
-      }
-	  else if(field == "location")
-		{
-			//function that loop through the location block and get the fields
-			std::cout << "location block?" << " " << value << std::endl;
 		}
+
+	  else if (field == "location")
+		{
+			//8 come from len of location
+			 std::cout << trim(line.substr( line.find("location") + 8 )) << std::endl;
+				getline(ss, value, '{');
+				std::cout << value << std::endl;
+		}
+		
     }
   }
   if ((field_list.size() == config_map.size()) || (field_list.size() != config_map.size() && config_map["server_name"] == ""))
