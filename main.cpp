@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
+#include <exception>
 
 int main(int argc,char **argv, char **envp)
 {

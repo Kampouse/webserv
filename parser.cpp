@@ -14,10 +14,6 @@ static std::string trim(const std::string& str)
     return str.substr(first, (last - first + 1));
 }
 
-
-
-
-
 bool is_semicolon(std::string str) {
   if (str.back() == ';')
     return true;
@@ -122,13 +118,14 @@ parser::~parser(void) { this->config_file_fd.close(); }
 
 parser::parser(const parser &src) {
   std::cout << "Copy constructor called" << std::endl;
-  // maybe herror here
+  // maybe error here
   this->path = src.path;
   this->config_file_fd.open(src.path);
   if (this->config_file_fd.fail()) {
-    std::cout << "Error opening file open(): " << src.path << std::endl;
-    exit(1);
+	std::cout << "Error opening file open(): " << src.path << std::endl;
+	exit(1);
   }
 }
+
 std::string parser::get_server_path(void) { return (this->path); }
 //
