@@ -1,16 +1,18 @@
 #include "parser.hpp"
+#include "config_structs.hpp"
 #include <iterator>
 #include <sstream>
+#include <string>
 
 
 static std::string trim(const std::string& str)
 {
-    size_t first = str.find_first_not_of(' ');
+    size_t first = str.find_first_not_of(WHITESPACES);
     if (std::string::npos == first)
     {
         return str;
     }
-    size_t last = str.find_last_not_of(' ');
+    size_t last = str.find_last_not_of(WHITESPACES);
     return str.substr(first, (last - first + 1));
 }
 
@@ -65,23 +67,26 @@ void parser::get_server_fields(void) {
   std::string field;
   std::string value;
   std::istringstream ss((std::string(line)));
-  std::map <std::string, std::string> config_map;
+  std::map<std::string, std::string> config_map;
   std::set<std::string> field_list = {"listen", "server_name", "index", "root"};
+  std::set<std::string>::iterator it;
   while (getline(config_file_fd, line)) {
-    ss = std::istringstream((std::string(line)));
-    while (getline(ss, field, ' ')) {
+    ss = std::istringstream(std::string(line)));
+	if (line.find("location") != 0)
+    while (getline(ss, field, ';')) {
       field = trim(field);
-      if (field_list.find(field) != field_list.end()) 
-		{
-			getline(ss, value, ';');
-			config_map[field] = trim(value);
-			std::cout << field << "(" << trim(value) << ")" <<  std::endl;
-      }
-	  else if(field == "location")
+	  
+		if(field.find("location") == 0)
 		{
 			//function that loop through the location block and get the fields
 			std::cout << "location block?" << " " << value << std::endl;
 		}
+    	else if ((it = field_list.find(field)) != field_list.end() && field.find(*it) == 0) 
+		{
+			config_map[*it] = trim(field.substr((*it).length, string::npos));
+			std::cout << *it << "(" << config_map[*it] << ")" <<  std::endl;
+      }
+	  field.clear();
     }
   }
   if ((field_list.size() == config_map.size()) || (field_list.size() != config_map.size() && config_map["server_name"] == ""))
@@ -91,13 +96,6 @@ void parser::get_server_fields(void) {
     std::cout << "Error in config file" << std::endl;
     exit(1);
   }
-
-
-
-
-
-
-
 
 }
 

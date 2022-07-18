@@ -5,6 +5,8 @@
 #include <vector>
 #include <stdbool.h>
 
+#define WHITESPACES "\t\n\v\f\r "
+
 struct location_info {
 	// cgi
 	std::string					root;
