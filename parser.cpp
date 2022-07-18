@@ -38,8 +38,8 @@ void parser ::check_for_error(void) {
       state = 2;
       bracket_state++;
     } else if (line.find("}") != std::string::npos) {
-      bracket_state--;
       state = 3;
+      bracket_state--;
     }
 
     if (is_semicolon(trim(line)) && bracket_state > 0 && state == 5)
@@ -72,7 +72,7 @@ void parser::get_server_fields(void) {
   std::set<std::string> field_list = {"listen", "server_name", "index", "root"};
   std::set<std::string>::iterator it;
   while (getline(config_file_fd, line)) {
-    ss = std::istringstream(std::string(line)));
+    ss = std::istringstream(std::string(line));
     while (getline(ss, field, ';')) {
       field = trim(field);
 	  
@@ -83,14 +83,14 @@ void parser::get_server_fields(void) {
 		}
     	else if ((it = field_list.find(field)) != field_list.end() && field.find(*it) == 0) 
 		{
-			config_map[*it] = trim(field.substr((*it).length, std::string::npos));
+			config_map[*it] = trim(field.substr((*it).length(), std::string::npos));
 			std::cout << *it << "(" << config_map[*it] << ")" <<  std::endl;
       	}
 		else if (field.find("error_page") == 0) 
 		{
 			std::string tmp(field.substr(10, std::string::npos));
 			tmp = trim(tmp);
-			error_pages.insert(std::pair<int, std::string>(atoi(tmp.c_str()), tmp.substr(tmp.find_last_of(WHITESPACES), std::string::npos)));
+			servers.back().error_pages.insert(std::pair<int, std::string>(atoi(tmp.c_str()), tmp.substr(tmp.find_last_of(WHITESPACES), std::string::npos)));
       	}
 	  field.clear();
     }
