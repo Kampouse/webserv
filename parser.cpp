@@ -3,6 +3,7 @@
 #include <iterator>
 #include <sstream>
 #include <string>
+#include <cstdlib>
 
 
 static std::string trim(const std::string& str)
@@ -72,7 +73,6 @@ void parser::get_server_fields(void) {
   std::set<std::string>::iterator it;
   while (getline(config_file_fd, line)) {
     ss = std::istringstream(std::string(line)));
-	if (line.find("location") != 0)
     while (getline(ss, field, ';')) {
       field = trim(field);
 	  
@@ -85,7 +85,13 @@ void parser::get_server_fields(void) {
 		{
 			config_map[*it] = trim(field.substr((*it).length, string::npos));
 			std::cout << *it << "(" << config_map[*it] << ")" <<  std::endl;
-      }
+      	}
+		else if (field.find("error_page") == 0) 
+		{
+			std::string tmp(field.substr(10, string::npos));
+			tmp = trim(tmp);
+			error_pages.insert(std::pair<int, std::string>(atoi(tmp.c_str()), tmp.substr(tmp.find_last_of(WHITESPACES), string::npos)));
+      	}
 	  field.clear();
     }
   }
