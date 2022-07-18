@@ -83,14 +83,14 @@ void parser::get_server_fields(void) {
 		}
     	else if ((it = field_list.find(field)) != field_list.end() && field.find(*it) == 0) 
 		{
-			config_map[*it] = trim(field.substr((*it).length, string::npos));
+			config_map[*it] = trim(field.substr((*it).length, std::string::npos));
 			std::cout << *it << "(" << config_map[*it] << ")" <<  std::endl;
       	}
 		else if (field.find("error_page") == 0) 
 		{
-			std::string tmp(field.substr(10, string::npos));
+			std::string tmp(field.substr(10, std::string::npos));
 			tmp = trim(tmp);
-			error_pages.insert(std::pair<int, std::string>(atoi(tmp.c_str()), tmp.substr(tmp.find_last_of(WHITESPACES), string::npos)));
+			error_pages.insert(std::pair<int, std::string>(atoi(tmp.c_str()), tmp.substr(tmp.find_last_of(WHITESPACES), std::string::npos)));
       	}
 	  field.clear();
     }
