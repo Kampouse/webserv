@@ -6,6 +6,7 @@
 # include <set>
 # include <vector>
 # include <string>
+# include <stdlib.h>
 
 #include "config_structs.hpp"
 #include "Exceptions.hpp"
@@ -23,7 +24,7 @@ class myparser
 		void parsefile(std::string path);
 		void extractfile(void);
 		void check_errors(void);
-		void split_servers(void);
+		void get_server_fields(void);
 
 		// std::string get_server_path(void);
 		// void get_server_fields(void);

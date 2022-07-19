@@ -12,3 +12,11 @@ const char * Exceptions::NestedServerError::what() const throw() { return ("Nest
 
 
 const char * Exceptions::SemicolonError::what() const throw() { return ("Missing ; in Configuration file\n"); }
+
+
+const char * Exceptions::UnknownFieldError::what() const throw() { return ("Unknown field in Configuration file\n"); }
+
+
+Exceptions::InvalidFieldError::InvalidFieldError(std::string _arg) : arg(_arg + " field has an invalid argument\n") {}
+Exceptions::InvalidFieldError::~InvalidFieldError() throw() {}
+const char * Exceptions::InvalidFieldError::what() const throw() { return (arg.c_str()); }
