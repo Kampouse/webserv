@@ -25,3 +25,8 @@ struct server_info {
 	unsigned int				client_max_body_size;
 	std::vector<location_info>	locations;
 };
+
+typedef enum parsing_state {
+	CONFIG_FIELD,
+	BRACE
+} parsing_state;

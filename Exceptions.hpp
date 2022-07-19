@@ -16,4 +16,20 @@ class Exceptions {
 				virtual ~FileOpeningError() throw();
 				virtual const char * what() const throw();
 		};
+
+
+		class ConfigError : public std::exception {
+			public:
+				virtual const char * what() const throw();
+		};
+
+		class NestedServerError : public std::exception {
+			public:
+				virtual const char * what() const throw();
+		};
+
+		class SemicolonError : public std::exception {
+			public:
+				virtual const char * what() const throw();
+		};
 };
