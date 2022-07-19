@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include "myparser.hpp"
 #include <iostream> 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -13,29 +14,34 @@
 int main(int argc,char **argv, char **envp)
 {
 
- std::vector<parser>  vec_list;
-	const char *defaul_config_path = "config/default.conf";
-if (argc < 2)
-	 vec_list.push_back( parser((char *)defaul_config_path)) ;
-else
-	{
-			for (int i = 1; i < argc; i++)
-			{
-				vec_list.push_back(parser((char *)argv[i]));
-			}
-	}
-	for (std::vector<parser>::iterator it = vec_list.begin(); it != vec_list.end(); ++it)
-	{
-		std::cout << "Server name: " << it->get_server_path() << std::endl;
-	} 
+	myparser parsing("./default.conf");
 
-	vec_list[0].check_for_error();
-	vec_list[0].get_server_fields();
+	parsing.printfile();
+
+//  std::vector<parser>  vec_list;
+// 	const char *defaul_config_path = "config/default.conf";
+// if (argc < 2)
+// 	 vec_list.push_back( parser((char *)defaul_config_path)) ;
+// else
+// 	{
+// 			for (int i = 1; i < argc; i++)
+// 			{
+// 				vec_list.push_back(parser((char *)argv[i]));
+// 			}
+// 	}
+// 	for (std::vector<parser>::iterator it = vec_list.begin(); it != vec_list.end(); ++it)
+// 	{
+// 		std::cout << "Server name: " << it->get_server_path() << std::endl;
+// 	} 
+
+// 	vec_list[0].check_for_error();
+// 	vec_list[0].get_server_fields();
 
 
 //vector of parser objects
 (void)envp;
 (void)argv;
+(void)argc;
 //create a socket
 	//AF_INET - address family ipv4
 	//SOCK_STREAM - TCP
