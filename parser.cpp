@@ -4,132 +4,225 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
+#include <exception>
 
+parser::parser() {}
+
+parser::~parser() {}
+
+parser::parser(std::string _path) {
+	parsefile(_path);
+}
 
 static std::string trim(const std::string& str)
 {
     size_t first = str.find_first_not_of(WHITESPACES);
-    if (std::string::npos == first)
-    {
+    if (first == std::string::npos)
         return str;
-    }
     size_t last = str.find_last_not_of(WHITESPACES);
     return str.substr(first, (last - first + 1));
 }
 
-bool is_semicolon(std::string str) {
-  if (str.back() == ';')
-    return true;
-  return false;
-}
-// there maybe some error with  the semicolon at the end 
-void parser ::check_for_error(void) {
-  std::string line;
-  int bracket_state = 0;
-  int state = 5;
-  while (getline(config_file_fd, line)) {
-
-    // this line assume that the config file is well formed
-    if (line.find("server") != std::string::npos &&
-        line.find("{") != std::string::npos && bracket_state == 0) {
-      state = 0;
-      bracket_state = 1;
-    } else if (line.find("{") != std::string::npos) {
-      state = 2;
-      bracket_state++;
-    } else if (line.find("}") != std::string::npos) {
-      state = 3;
-      bracket_state--;
-    }
-
-    if (is_semicolon(trim(line)) && bracket_state > 0 && state == 5)
-		continue ;
-    else if (state == 5 && trim(line).size() == 0)
-      continue ;
-    else if (state == 5)
-		{
-			std::cout << "missing ;  at" << line << std::endl;
-			exit(1);
-		}
-    state = 5;
-  }
-  if (bracket_state != 0) {
-    std::cout << "Error in config file" << std::endl;
-    exit(1);
-  }
-}
-
-void parser::get_server_fields(void) {
-  config_file_fd.clear();
-  config_file_fd.seekg(0, std::ios::beg);
-
-  std::string line;
-  getline(config_file_fd, line);
-  std::string field;
-  std::string value;
-  std::istringstream ss((std::string(line)));
-  std::map<std::string, std::string> config_map;
-  std::set<std::string> field_list = {"listen", "server_name", "index", "root"};
-  std::set<std::string>::iterator it;
-  while (getline(config_file_fd, line)) {
-    ss = std::istringstream(std::string(line));
-    while (getline(ss, field, ';')) {
-      field = trim(field);
-	  
-		if(field.find("location") == 0)
-		{
-			//function that loop through the location block and get the fields
-			std::cout << "location block?" << " " << value << std::endl;
-		}
-    	else if ((it = field_list.find(field)) != field_list.end() && field.find(*it) == 0) 
-		{
-			config_map[*it] = trim(field.substr((*it).length(), std::string::npos));
-			std::cout << *it << "(" << config_map[*it] << ")" <<  std::endl;
-      	}
-		else if (field.find("error_page") == 0) 
-		{
-			std::string tmp(field.substr(10, std::string::npos));
-			tmp = trim(tmp);
-			servers.back().error_pages.insert(std::pair<int, std::string>(atoi(tmp.c_str()), tmp.substr(tmp.find_last_of(WHITESPACES), std::string::npos)));
-      	}
-	  field.clear();
-    }
-  }
-  if ((field_list.size() == config_map.size()) || (field_list.size() != config_map.size() && config_map["server_name"] == ""))
-		config_maps.push_back(config_map);
-  else 
+void parser::extractfile()
+{
+	std::string line;
+	size_t pos;
+	while (getline(config_file_fd, line))
 	{
-    std::cout << "Error in config file" << std::endl;
-    exit(1);
-  }
-
+		line = trim(line);
+		while ((pos = line.find_first_of("{}")) != std::string::npos || line.length())
+		{
+			if (pos == std::string::npos)
+			{
+				ext_file.push_back(line);
+				break;
+			}
+			else if (pos == 0)
+			{
+				ext_file.push_back(line.substr(0, 1));
+				line = line.substr(1, std::string::npos);
+			}
+			else
+			{
+				ext_file.push_back(line.substr(0, pos));
+				line = line.substr(pos, std::string::npos);
+			}
+			line = trim(line);
+		}
+		line.clear();
+	}
 }
 
-parser::parser(char *str) {
-  std::cout << "Constructor called" << std::endl;
-  this->path = str;
-  std::cout << "Path: " << this->path << std::endl;
-  this->config_file_fd.open(str);
-  if (this->config_file_fd.fail()) {
-    std::cout << "Error opening file open(): " << str << std::endl;
-    exit(1);
-  }
+void parser::check_errors(void) {
+	std::string line;
+	int bracket_state = 0;
+	parsing_state state = CONFIG_FIELD;
+	std::vector<std::string>::iterator it = ext_file.begin();
+
+	while (it != ext_file.end()) {
+		// std::cout << "Reached\n";
+		std::cout << *it << "\n";
+		// this line assume that the config file is well formed
+		if (*it == "server" && bracket_state != 0)
+			throw Exceptions::NestedServerError();
+
+		if (bracket_state == 0 && *it != "server")
+			throw Exceptions::ConfigError();
+
+		if (*it == "server" || ((*it).find("location") == 0 && (*it).find('/') != std::string::npos)) {
+			if (*(++it) != "{")
+				throw Exceptions::ConfigError();
+			state = BRACE;
+			bracket_state++;
+		} else if (*it == "{") {
+			state = BRACE;
+			bracket_state++;
+		} else if (*it == "}") {
+			state = BRACE;
+			bracket_state--;
+		}
+		else
+			state = CONFIG_FIELD;
+
+		if (bracket_state == -1)
+			throw Exceptions::ConfigError();
+
+		if (state == CONFIG_FIELD && (*it).back() != ';')
+			throw Exceptions::SemicolonError();
+		it++;
+	}
+
+	if (bracket_state != 0)
+		throw Exceptions::ConfigError();
 }
 
-parser::parser() {}
+void parser::manage_locations(std::vector<std::string>::iterator it)
+{
+	size_t pos;
+	std::string data, field;
 
-parser::~parser(void) { this->config_file_fd.close(); }
+	servers.back().locations.push_back(location_info());
+	servers.back().locations.back().location = (*it).substr((*it).find('/'), std::string::npos);
+	it += 2;
+	while (*it != "}")
+	{
+		pos = (*it).find_first_of(WHITESPACES);
+		field = (*it).substr(0, pos);
+		data = (*it).substr(pos, (*it).find_first_of(';') - pos);
+		data = trim(data);
 
-parser::parser(const parser &src) {
-  std::cout << "Copy constructor called" << std::endl;
-  // maybe error here
-  this->path = src.path;
-  this->config_file_fd.open(src.path);
-  if (this->config_file_fd.fail()) {
-	std::cout << "Error opening file open(): " << src.path << std::endl;
-	exit(1);
-  }
+		if (field == "root") {
+			servers.back().locations.back().root = data;
+		}
+		else if (field == "cgi_ext") {
+			std::string cgi, root;
+			cgi = data.substr(0, data.find_first_of(WHITESPACES));
+			root = data.substr(cgi.length(), std::string::npos);
+			root = trim(root);
+			servers.back().locations.back().cgi.insert(std::pair<std::string, std::string>(cgi, root));
+		}
+		else if (field == "index") {
+			servers.back().locations.back().index = data;
+		}
+		else if (field == "autoindex") {
+			if (data != "on" && data != "off")
+				throw Exceptions::InvalidFieldError("autoindex");
+			servers.back().locations.back().autoindex = ((data == "on") ? true : false);
+		}
+		else if (field == "upload_dir") {
+			servers.back().locations.back().upload_dir = data;
+		}
+		else if (field == "allow_request") {
+			while (data.length()) {
+				servers.back().locations.back().allowed_requests.push_back(data.substr(0, data.find_first_of(WHITESPACES)));
+				if (data.find_first_of(WHITESPACES) == std::string::npos)
+					data = "";
+				else
+				{
+					data = data.substr(data.find_first_of(WHITESPACES), std::string::npos);
+					data = trim(data);
+				}
+			}
+		}
+		else if (field == "return") {
+			;
+		}
+		else
+			throw Exceptions::UnknownFieldError();
+		it++;
+	}
 }
 
-std::string parser::get_server_path(void) { return (this->path); }
-//
+void parser::get_server_fields(void)
+{
+	std::vector<std::string>::iterator it = ext_file.begin();
+	size_t pos;
+	std::string data, field;
+
+	servers.push_back(server_info());
+	while (++it != ext_file.end())
+	{
+		if (*it == "server")
+			servers.push_back(server_info());
+		else if (*it == "{" || *it == "}")
+			continue;
+		else if ((*it).find("location") == 0 && (*it).find('/') != std::string::npos) {
+			manage_locations(it);
+			while (*it != "}")
+				it++;
+		}
+		else {
+			pos = (*it).find_first_of(WHITESPACES);
+			field = (*it).substr(0, pos);
+			data = (*it).substr(pos, (*it).find_first_of(';') - pos);
+			data = trim(data);
+
+			if (field == "listen") {
+				if (std::count(data.begin(), data.end(), ':') != 1)
+					throw Exceptions::InvalidFieldError("listen");
+				pos = data.find(':');
+				servers.back().host = data.substr(0, pos);
+				data = data.substr(pos + 1, std::string::npos);
+				servers.back().port = atoi(data.c_str());
+			}
+			else if (field == "server_name") {
+				servers.back().server_names = data;
+			}
+			else if (field == "client_max_body_size") {
+				if (!std::isdigit(data[0]))
+					throw Exceptions::InvalidFieldError("client_max_body_size");
+				servers.back().client_max_body_size = atoi(data.c_str());
+				pos = std::to_string(servers.back().client_max_body_size).length();
+				if (data.length() != pos + 1 || (data[pos] != 'm' && data[pos] != 'M'))
+					throw Exceptions::InvalidFieldError("client_max_body_size");
+			}
+			else if (field == "error_page") {
+				if (!std::isdigit(data[0]))
+					throw Exceptions::InvalidFieldError("error_page");
+				servers.back().error_pages.insert(std::pair<int, std::string>(atoi(data.c_str()), \
+										data.substr(data.find_last_of(WHITESPACES), std::string::npos)));
+			}
+			else
+				throw Exceptions::UnknownFieldError();
+		}
+	}
+}
+
+void parser::parsefile(std::string path)
+{
+	this->config_file_fd.open(path.c_str());
+	if (this->config_file_fd.fail())
+		throw Exceptions::FileOpeningError(path);
+	extractfile();
+	this->config_file_fd.close();
+	printfile();
+	check_errors();
+	get_server_fields();
+}
+
+void parser::printfile(void)
+{
+	std::vector<std::string>::iterator it = ext_file.begin();
+	while (it != ext_file.end())
+		std::cout << *it++ << "\n";
+}

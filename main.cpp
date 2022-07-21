@@ -13,10 +13,13 @@
 
 int main(int argc,char **argv, char **envp)
 {
+	try {
+		myparser parsing("./default.conf");
+	} catch (std::exception &e) {
+		std::cout << e.what();
+	}
 
-	myparser parsing("./default.conf");
-
-	parsing.printfile();
+	// parsing.printfile();
 
 //  std::vector<parser>  vec_list;
 // 	const char *defaul_config_path = "config/default.conf";
