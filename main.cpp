@@ -10,79 +10,67 @@
 #include <vector>
 #include <exception>
 
-int main(int argc,char **argv, char **envp)
+
+#include <stdio.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <string.h>
+
+#define PORT 9998
+
+int main(int argc, char const *argv[])
 {
-	try {
-		parser parsing("./default.conf");
-	} catch (std::exception &e) {
-		std::cout << e.what();
-	}
+	(void) argc , (void) argv;
+    int server_fd, new_socket; long valread;
+    struct sockaddr_in address;
+    int addrlen = sizeof(address);
+    
+ const   char *hello = "Hello from server";
+    
+    // Creating socket file descriptor
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+    {
+        perror("In socket");
+        exit(EXIT_FAILURE);
+    }
+    
 
-	// parsing.printfile();
-
-//  std::vector<parser>  vec_list;
-// 	const char *defaul_config_path = "config/default.conf";
-// if (argc < 2)
-// 	 vec_list.push_back( parser((char *)defaul_config_path)) ;
-// else
-// 	{
-// 			for (int i = 1; i < argc; i++)
-// 			{
-// 				vec_list.push_back(parser((char *)argv[i]));
-// 			}
-// 	}
-// 	for (std::vector<parser>::iterator it = vec_list.begin(); it != vec_list.end(); ++it)
-// 	{
-// 		std::cout << "Server name: " << it->get_server_path() << std::endl;
-// 	} 
-
-// 	vec_list[0].check_for_error();
-// 	vec_list[0].get_server_fields();
-
-
-//vector of parser objects
-(void)envp;
-(void)argv;
-(void)argc;
-//create a socket
-	//AF_INET - address family ipv4
-	//SOCK_STREAM - TCP
-	//0 - IPPROTO_IP (IP protocol)
-	/*
-	int socket_number = socket(AF_INET, SOCK_STREAM, 0);
-	if (socket_number == -1)
-	{
-		std::cout << "Error creating socket" << std::endl;
-		return -1;
-	}
-	// Listening on port 9999
-	//
-	struct sockaddr_in  socket_address;
-	socket_address.sin_family = AF_INET;
-	socket_address.sin_port = htons(9999);
-	socket_address.sin_addr.s_addr = INADDR_ANY;
-	if (bind(socket_number, (struct sockaddr*)&socket_address, sizeof(socket_address)) == -1)
-	{
-		std::cout << "Error binding socket" << std::endl;
-		return -1;
-	}
-	if (listen(socket_number, 5) == -1)
-	{
-		std::cout << "Error listening socket" << std::endl;
-		return -1;
-	}
-	// Accepting connection
-	//
-  unsigned  int client_address_length = sizeof(struct sockaddr_in); 
-  	struct sockaddr_in client_address;
-	int client_socket_number = accept(socket_number, (struct sockaddr*)&client_address, &client_address_length);
-	if (client_socket_number == -1)
-	{
-		std::cout << "Error accepting connection" << std::endl;
-		return -1;
-	}
-const 	char *message = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\n"; 
-	send(client_socket_number ,message , strlen(message), 0); 
-*/
-
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons( PORT );
+    
+    memset(address.sin_zero, '\0', sizeof address.sin_zero);
+    
+    
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
+    {
+        perror("In bind");
+        exit(EXIT_FAILURE);
+    }
+    if (listen(server_fd, 10) < 0)
+    {
+        perror("In listen");
+        exit(EXIT_FAILURE);
+    }
+    while(1)
+    {
+        printf("\n+++++++ Waiting for new connection ++++++++\n\n");
+        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
+        {
+            perror("In accept");
+            exit(EXIT_FAILURE);
+        }
+        char buffer[30000] = {0};
+		// this is the buffer that will be used to store the data received from the client
+        valread = read( new_socket , buffer, 30000);
+        printf("(|%s|)\n",buffer );
+		// here we will parse the data received from the client and store it in a vector of strings
+		// and send back the right response to the client
+        write(new_socket , hello , strlen(hello));
+        printf("------------------Hello message sent-------------------\n");
+        close(new_socket);
+    }
+    return 0;
 }
