@@ -67,7 +67,7 @@ void myparser::check_errors(void) {
 		if (bracket_state == 0 && *it != "server")
 			throw Exceptions::ConfigError();
 
-		if (*it == "server" || (*it).find("location /") == 0) {
+		if (*it == "server" || ((*it).find("location") == 0 && (*it).find('/') != std::string::npos)) {
 			if (*(++it) != "{")
 				throw Exceptions::ConfigError();
 			state = BRACE;
