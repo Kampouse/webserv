@@ -25,6 +25,7 @@ class myparser
 		void extractfile(void);
 		void check_errors(void);
 		void get_server_fields(void);
+		void manage_locations(std::vector<std::string>::iterator it);
 
 		// std::string get_server_path(void);
 		// void get_server_fields(void);

@@ -8,12 +8,13 @@
 #define WHITESPACES "\t\n\v\f\r "
 
 struct location_info {
-	// cgi
-	std::string					location;
-	std::string					root;
-	std::vector<std::string>	allowed_requests;
-	std::string					index;
-	bool						autoindex;
+	std::string							location;
+	std::string							root;
+	std::map<std::string, std::string>	cgi;
+	std::vector<std::string>			allowed_requests;
+	std::string							index;
+	std::string							upload_dir;
+	bool								autoindex;
 
 	location_info() {
 		autoindex = false;
@@ -31,6 +32,7 @@ struct server_info {
 	server_info() {
 		client_max_body_size = 0;
 		port = 0;
+		server_names = "localhost";
 	}
 };
 

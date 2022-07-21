@@ -58,6 +58,7 @@ void myparser::check_errors(void) {
 	int bracket_state = 0;
 	parsing_state state = CONFIG_FIELD;
 	std::vector<std::string>::iterator it = ext_file.begin();
+
 	while (it != ext_file.end()) {
 		// this line assume that the config file is well formed
 		if (*it == "server" && bracket_state != 0)
@@ -97,6 +98,60 @@ void myparser::check_errors(void) {
 		throw Exceptions::ConfigError();
 }
 
+void myparser::manage_locations(std::vector<std::string>::iterator it)
+{
+	size_t pos;
+	std::string data, field;
+
+	servers.back().locations.push_back();
+	servers.back().locations.back().location = (*it).substr((*it).find('/'), std::string::npos);
+	it += 2;
+	while (*it != "}")
+	{
+		pos = (*it).find_first_of(WHITESPACES);
+		field = (*it).substr(0, pos);
+		data = (*it).substr(pos, (*it).find_first_of(';') - pos);
+		data = trim(data);
+
+		if (field == "root") {
+			servers.back().locations.back().root = data;
+		}
+		else if (field == "cgi_ext") {
+			std::string cgi, root;
+			cgi = data.substr(0, data.find_first_of(WHITESPACES));
+			root = data.substr(cgi.length(), std::string::npos);
+			root = trim(root);
+			servers.back().locations.back().cgi.insert(std::pair<std::string, std::string>(cgi, root));
+		}
+		else if (field == "index") {
+			servers.back().locations.back().index = data;
+		}
+		else if (field == "autoindex") {
+			if (data != "on" || data != "off")
+				throw Exceptions::InvalidFieldError("autoindex");
+			servers.back().locations.back().autoindex = ((data == "on") ? true : false);
+		}
+		else if (field == "upload_dir") {
+			servers.back().locations.back().upload_dir = data;
+		}
+		else if (field == "allow_request") {
+			while (data.length()) {
+				servers.back().locations.back().allowed_requests.push_back(data.substr(0, data.find_first_of(WHITESPACES)));
+				if (data.find_first_of(WHITESPACES) == std::string::npos)
+					data = "";
+				else
+				{
+					data = data.substr(data.find_first_of(WHITESPACES), std::string::npos);
+					data = trim(data);
+				}
+			}
+		}
+		else
+			throw Exceptions::UnknownFieldError();
+		it++;
+	}
+}
+
 void myparser::get_server_fields(void)
 {
 	std::vector<std::string>::iterator it = ext_file.begin();
@@ -108,28 +163,30 @@ void myparser::get_server_fields(void)
 	{
 		if (*it == "server")
 			servers.push_back();
-		else if ((*it).find("location") == 0 && (*it).find('/') != std::string::npos) {
-			// locations
-		}
 		else if (*it == "{" || *it == "}")
 			continue;
+		else if ((*it).find("location") == 0 && (*it).find('/') != std::string::npos) {
+			manage_locations(it);
+			while (*it != "}")
+				it++;
+		}
 		else {
 			pos = (*it).find_first_of(WHITESPACES);
 			field = (*it).substr(0, pos);
-			data = (*it).substr(pos, std::string::npos);
+			data = (*it).substr(pos, (*it).find_first_of(';') - pos);
 			data = trim(data);
 
-			if (field.find("listen") == 0) {
+			if (field == "listen") {
 				if (std::count(data.begin(), data.end(), ':') != 1)
 					throw Exceptions::InvalidFieldError("listen");
 				pos = data.find(':');
 				servers.back().host = data.substr(0, pos);
 				servers.back().port = data.substr(pos + 1, std::string::npos);
 			}
-			else if ((*it).find("server_name") == 0) {
+			else if (field == "server_name") {
 				servers.back().server_names = data;
 			}
-			else if ((*it).find("client_max_body_size") == 0) {
+			else if (field == "client_max_body_size") {
 				if (!std::isdigit(*data))
 					throw Exceptions::InvalidFieldError("client_max_body_size");
 				servers.back().client_max_body_size = atoi(data.c_str());
@@ -137,7 +194,7 @@ void myparser::get_server_fields(void)
 				if (data.length() != pos + 1 || data[pos] != 'm' || data[pos] != 'M')
 					throw Exceptions::InvalidFieldError("client_max_body_size");
 			}
-			else if ((*it).find("error_page") == 0) {
+			else if (field == "error_page") {
 				if (!std::isdigit(*data))
 					throw Exceptions::InvalidFieldError("error_page");
 				servers.back().error_pages.insert(std::pair<int, std::string>(atoi(data.c_str()), \
