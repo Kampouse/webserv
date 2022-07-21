@@ -8,33 +8,42 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
+#include <exception>
 
 int main(int argc,char **argv, char **envp)
 {
-
- std::vector<parser>  vec_list;
-	const char *defaul_config_path = "config/default.conf";
-if (argc < 2)
-	 vec_list.push_back( parser((char *)defaul_config_path)) ;
-else
-	{
-			for (int i = 1; i < argc; i++)
-			{
-				vec_list.push_back(parser((char *)argv[i]));
-			}
+	try {
+		parser parsing("./default.conf");
+	} catch (std::exception &e) {
+		std::cout << e.what();
 	}
-	for (std::vector<parser>::iterator it = vec_list.begin(); it != vec_list.end(); ++it)
-	{
-		std::cout << "Server name: " << it->get_server_path() << std::endl;
-	} 
 
-	vec_list[0].check_for_error();
-	vec_list[0].get_server_fields();
+	// parsing.printfile();
+
+//  std::vector<parser>  vec_list;
+// 	const char *defaul_config_path = "config/default.conf";
+// if (argc < 2)
+// 	 vec_list.push_back( parser((char *)defaul_config_path)) ;
+// else
+// 	{
+// 			for (int i = 1; i < argc; i++)
+// 			{
+// 				vec_list.push_back(parser((char *)argv[i]));
+// 			}
+// 	}
+// 	for (std::vector<parser>::iterator it = vec_list.begin(); it != vec_list.end(); ++it)
+// 	{
+// 		std::cout << "Server name: " << it->get_server_path() << std::endl;
+// 	} 
+
+// 	vec_list[0].check_for_error();
+// 	vec_list[0].get_server_fields();
 
 
 //vector of parser objects
 (void)envp;
 (void)argv;
+(void)argc;
 //create a socket
 	//AF_INET - address family ipv4
 	//SOCK_STREAM - TCP
@@ -52,12 +61,10 @@ else
 	socket_address.sin_family = AF_INET;
 	socket_address.sin_port = htons(9999);
 	socket_address.sin_addr.s_addr = INADDR_ANY;
-
 	if (bind(socket_number, (struct sockaddr*)&socket_address, sizeof(socket_address)) == -1)
 	{
 		std::cout << "Error binding socket" << std::endl;
 		return -1;
-
 	}
 	if (listen(socket_number, 5) == -1)
 	{
@@ -79,4 +86,3 @@ const 	char *message = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Lengt
 */
 
 }
-

@@ -1,28 +1,40 @@
-#ifndef PARSER_HPP
-# define PARSER_HPP
+#pragma once
+
 # include <fstream> 
 # include <iostream>
 # include <map>
 # include <set>
 # include <vector>
-# include "./config_structs.hpp"
+# include <string>
+# include <stdlib.h>
+
+#include "config_structs.hpp"
+#include "Exceptions.hpp"
+
+class Exceptions;
+
 class parser
 {
 	private:
 		std::ifstream config_file_fd;
-		char *path;
-		std::vector<std::map <std::string, std::string> > config_maps  ;
-	public:
-		parser(char *str);
-		std::string get_server_path(void);
+		// std::vector<std::map<std::string, std::string> > config_maps;
+		std::vector<server_info> servers;
+		std::vector<std::string> ext_file;
+
+		void parsefile(std::string path);
+		void extractfile(void);
+		void check_errors(void);
 		void get_server_fields(void);
+		void manage_locations(std::vector<std::string>::iterator it);
 
-		parser (parser const &src);
+		// std::string get_server_path(void);
+		// void get_server_fields(void);
+
+
+	public:
 		parser();
-		~parser(void);
-		parser	&operator = (const parser &copy);
-		void  check_for_error(void);
+		parser(std::string _path);
+		~parser();
 
+		void printfile(void);
 };
-
-#endif
