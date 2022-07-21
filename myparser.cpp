@@ -103,7 +103,7 @@ void myparser::manage_locations(std::vector<std::string>::iterator it)
 	size_t pos;
 	std::string data, field;
 
-	servers.back().locations.push_back();
+	servers.back().locations.push_back(location_info());
 	servers.back().locations.back().location = (*it).substr((*it).find('/'), std::string::npos);
 	it += 2;
 	while (*it != "}")
@@ -158,11 +158,11 @@ void myparser::get_server_fields(void)
 	size_t pos;
 	std::string data, field;
 
-	servers.push_back();
+	servers.push_back(server_info());
 	while (++it != ext_file.end())
 	{
 		if (*it == "server")
-			servers.push_back();
+			servers.push_back(server_info());
 		else if (*it == "{" || *it == "}")
 			continue;
 		else if ((*it).find("location") == 0 && (*it).find('/') != std::string::npos) {
@@ -181,13 +181,14 @@ void myparser::get_server_fields(void)
 					throw Exceptions::InvalidFieldError("listen");
 				pos = data.find(':');
 				servers.back().host = data.substr(0, pos);
-				servers.back().port = data.substr(pos + 1, std::string::npos);
+				data = data.substr(pos + 1, std::string::npos);
+				servers.back().port = atoi(data.c_str());
 			}
 			else if (field == "server_name") {
 				servers.back().server_names = data;
 			}
 			else if (field == "client_max_body_size") {
-				if (!std::isdigit(*data))
+				if (!std::isdigit(data[0]))
 					throw Exceptions::InvalidFieldError("client_max_body_size");
 				servers.back().client_max_body_size = atoi(data.c_str());
 				pos = std::to_string(servers.back().client_max_body_size).length();
@@ -195,7 +196,7 @@ void myparser::get_server_fields(void)
 					throw Exceptions::InvalidFieldError("client_max_body_size");
 			}
 			else if (field == "error_page") {
-				if (!std::isdigit(*data))
+				if (!std::isdigit(data[0]))
 					throw Exceptions::InvalidFieldError("error_page");
 				servers.back().error_pages.insert(std::pair<int, std::string>(atoi(data.c_str()), \
 										data.substr(data.find_last_of(WHITESPACES), std::string::npos)));
