@@ -24,6 +24,13 @@ val: all
 clean:
 	    ${RM} ${OBJS}
 
+
+
+test: all 
+
+	./${NAME}  & sleep 1 &&  curl http://localhost:9999 && killall  ${NAME}
+	@echo "Testing done."
+
 fclean: clean
 	@${RM} ${NAME}
 	@${RM} ${NAME_TEST}
