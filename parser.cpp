@@ -99,10 +99,10 @@ void parser::check_errors(void) {
 void parser::manage_locations(std::vector<std::string>::iterator it)
 {
 	size_t pos;
-	std::string data, field;
+	std::string data, field, location;
 
-	servers.back().locations.push_back(location_info());
-	servers.back().locations.back().location = (*it).substr((*it).find('/'), std::string::npos);
+	location = (*it).substr((*it).find('/'), std::string::npos);
+	servers.back().locations.insert(std::pair<std::string, location_info>(location, location_info()));
 	it += 2;
 	while (*it != "}")
 	{
@@ -112,29 +112,29 @@ void parser::manage_locations(std::vector<std::string>::iterator it)
 		data = trim(data);
 
 		if (field == "root") {
-			servers.back().locations.back().root = data;
+			servers.back().locations[location].root = data;
 		}
 		else if (field == "cgi_ext") {
 			std::string cgi, root;
 			cgi = data.substr(0, data.find_first_of(WHITESPACES));
 			root = data.substr(cgi.length(), std::string::npos);
 			root = trim(root);
-			servers.back().locations.back().cgi.insert(std::pair<std::string, std::string>(cgi, root));
+			servers.back().locations[location].cgi.insert(std::pair<std::string, std::string>(cgi, root));
 		}
 		else if (field == "index") {
-			servers.back().locations.back().index = data;
+			servers.back().locations[location].index = data;
 		}
 		else if (field == "autoindex") {
 			if (data != "on" && data != "off")
 				throw Exceptions::InvalidFieldError("autoindex");
-			servers.back().locations.back().autoindex = ((data == "on") ? true : false);
+			servers.back().locations[location].autoindex = ((data == "on") ? true : false);
 		}
 		else if (field == "upload_dir") {
-			servers.back().locations.back().upload_dir = data;
+			servers.back().locations[location].upload_dir = data;
 		}
 		else if (field == "allow_request") {
 			while (data.length()) {
-				servers.back().locations.back().allowed_requests.push_back(data.substr(0, data.find_first_of(WHITESPACES)));
+				servers.back().locations[location].allowed_requests.push_back(data.substr(0, data.find_first_of(WHITESPACES)));
 				if (data.find_first_of(WHITESPACES) == std::string::npos)
 					data = "";
 				else
@@ -192,7 +192,9 @@ void parser::get_server_fields(void)
 				if (!std::isdigit(data[0]))
 					throw Exceptions::InvalidFieldError("client_max_body_size");
 				servers.back().client_max_body_size = atoi(data.c_str());
-				pos = std::to_string(servers.back().client_max_body_size).length();
+				pos = 0;
+				while (std::isdigit(data[pos]))
+					pos++;
 				if (data.length() != pos + 1 || (data[pos] != 'm' && data[pos] != 'M'))
 					throw Exceptions::InvalidFieldError("client_max_body_size");
 			}

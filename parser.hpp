@@ -10,6 +10,7 @@
 
 #include "config_structs.hpp"
 #include "Exceptions.hpp"
+#include "utils.hpp"
 
 class Exceptions;
 
@@ -17,7 +18,6 @@ class parser
 {
 	private:
 		std::ifstream config_file_fd;
-		// std::vector<std::map<std::string, std::string> > config_maps;
 		std::vector<server_info> servers;
 		std::vector<std::string> ext_file;
 
@@ -26,10 +26,6 @@ class parser
 		void check_errors(void);
 		void get_server_fields(void);
 		void manage_locations(std::vector<std::string>::iterator it);
-
-		// std::string get_server_path(void);
-		// void get_server_fields(void);
-
 
 	public:
 		parser();
