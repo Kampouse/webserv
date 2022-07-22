@@ -1,4 +1,4 @@
-#include "parser.hpp"
+#include "Server.hpp"
 #include <iostream> 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -12,13 +12,25 @@
 
 #define PORT 9998
 
-int main(int argc,char **argv, char **envp)
+int main(int argc,char **argv)
 {
-	try {
-		parser parsing("./default.conf");
-	} catch (std::exception &e) {
-		std::cout << e.what();
+	if (argc <= 2)
+	{
+		try {
+			std::string path;
+			path = (argc == 1) ? "./default.conf" : std::string(argv[1]);
+			Server servers(path);
+		} catch (std::exception &e) {
+			std::cout << e.what();
+			return EXIT_FAILURE;
+		}
 	}
+	else
+	{
+		std::cout << "Too many arguments\n";
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
 
 	(void) argc , (void) argv;
 	int server_fd, new_socket;

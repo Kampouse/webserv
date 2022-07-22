@@ -32,5 +32,7 @@ class parser
 		parser(std::string _path);
 		~parser();
 
+		std::vector<server_info> getServers();
+
 		void printfile(void);
 };
