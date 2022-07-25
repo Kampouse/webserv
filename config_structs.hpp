@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <stdbool.h>
+#include <netinet/in.h>
 
 #define WHITESPACES "\t\n\v\f\r "
 
@@ -22,16 +23,19 @@ struct location_info {
 };
 
 struct server_info {
-	std::string					host;
-	int							port;
-	std::string					server_names;
-	std::map<int, std::string>	error_pages;
-	unsigned int				client_max_body_size;
+	std::string								host;
+	int										port;
+	std::string								server_names;
+	std::map<int, std::string>				error_pages;
+	unsigned int							client_max_body_size;
+	int										server_fd;
+	struct sockaddr_in						address;
 	std::map<std::string, location_info>	locations;
 
 	server_info() {
 		client_max_body_size = 0;
 		port = 0;
+		server_fd = 0;
 		server_names = "localhost";
 	}
 };

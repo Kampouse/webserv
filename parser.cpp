@@ -222,6 +222,8 @@ void parser::parsefile(std::string path)
 	get_server_fields();
 }
 
+std::vector<server_info> parser::getServers() { return (servers); }
+
 void parser::printfile(void)
 {
 	std::vector<std::string>::iterator it = ext_file.begin();
