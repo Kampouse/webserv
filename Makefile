@@ -16,7 +16,8 @@ ${NAME}:${OBJS}
 		@${CC} ${OBJS} ${FLAGS} -o ${NAME}
 
 run:  all 
-	./${NAME}
+	./${NAME} & sleep  1 && curl http://localhost:9997/api
+	
 
 val: all
 	valgrind  --leak-check=yes --track-origins=yes -s --trace-children=yes  ./${NAME}
