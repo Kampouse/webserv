@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/poll.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
@@ -23,8 +24,14 @@ class Server
 	private:
 		std::vector<server_info>	servers;
 		std::vector<int>			binded_ports;
+		std::vector<pollfd>			fds;
+		std::string					str_buffer;
+
 
 		bool canBind(int port);
+
+		void handle_listen(int i);
+		void handle_client(std::vector<pollfd>::iterator& it, int i);
 
 	public:
 		Server();
@@ -32,4 +39,5 @@ class Server
 		~Server();
 
 		void connect_servers(void);
+		void run(void);
 };

@@ -34,6 +34,12 @@ void Server::connect_servers(void)
 
 		if (listen(servers[i].server_fd, 10) < 0)
 			throw std::runtime_error("Listen failed");
+
+		pollfd newfd;
+		newfd.fd = servers[i].server_fd;
+		newfd.events = POLLIN;
+		newfd.revents = 0;
+		fds.push_back(newfd);
 	}
 }
 
@@ -47,4 +53,74 @@ bool Server::canBind(int port)
 		}
 	}
 	return (true);
+}
+
+void Server::handle_listen(int i)
+{
+	sockaddr_storage client_addr;
+	socklen_t addrlen = sizeof(client_addr)
+
+	int client_fd = accept(fds[i].fd, (struct sockaddr*)&client_addr, &addrlen);
+
+	if (client_fd == -1)
+		throw std::runtime_error("Accept Error");
+
+	fds.push_back(pollfd());
+	fds.back().fd = fds[i].fd;
+	fds.back().events = POLLIN;
+	fds.back().revents = 0;
+}
+
+void Server::handle_client(std::vector<pollfd>::iterator& it, int i)
+{
+	char buf[4096];
+	int sender_fd = fds[i].fd;
+	int nbytes = recv(sender_fd, buf, 4096, 0);
+
+	if (nbytes <= 0)
+	{
+		if (nbytes < 0)
+			;// print error, not throw???
+		close(fds[i].fd);
+		fds.erase(it);
+		it = fds.begin();
+	}
+	else
+	{
+		for (size_t j = 0; j < nbytes; j++)
+			str_buffer.push_back(buf[j]);
+
+		// send response here
+		bzero(buf, 4096);
+		str_buffer.clear();
+	}
+}
+
+void Server::run(void)
+{
+	int ret;
+
+	while (true)
+	{
+		if ((ret = poll(&(fds.front), fds.size, 10000)) <= 0)
+		{
+			if (ret == 0)
+				throw std::runtime_error("Request Timeout [408]");
+			if (ret == -1)
+				throw std::runtime_error("Internal Server Error [500]")
+		}
+
+		std::vector<pollfd>::iterator it;
+		for (it = fds.begin(); it != fds.end(); it++)
+		{
+			if (it->revents & POLLIN) {
+				for (size_t i = 0; i < fds.size; i++) {
+					if (it->fd == fds[i].fd)
+						handle_listen(i);
+					else
+						handle_client(it, i);
+				}
+			}
+		}
+	}
 }
