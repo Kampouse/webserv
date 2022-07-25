@@ -2,7 +2,7 @@ NAME = webserv
 CC = g++
 FLAGS = -Wall -Wextra -Werror --std=c++98 -g
 
-SRCS = main.cpp parser.cpp Exceptions.cpp
+SRCS = main.cpp parser.cpp Exceptions.cpp request.cpp
 RM =  rm -rf
 
 .cpp.o:
@@ -28,7 +28,7 @@ clean:
 
 test: all 
 
-	./${NAME}  & sleep 1 &&  curl http://localhost:9999 && killall  ${NAME}
+	./${NAME}  & sleep 1 &&  curl http://localhost:9997 && killall  ${NAME}
 	@echo "Testing done."
 
 fclean: clean
