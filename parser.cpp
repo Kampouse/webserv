@@ -60,8 +60,6 @@ void parser::check_errors(void) {
 	std::vector<std::string>::iterator it = ext_file.begin();
 
 	while (it != ext_file.end()) {
-		// std::cout << "Reached\n";
-		std::cout << *it << "\n";
 		// this line assume that the config file is well formed
 		if (*it == "server" && bracket_state != 0)
 			throw Exceptions::NestedServerError();
@@ -217,7 +215,7 @@ void parser::parsefile(std::string path)
 		throw Exceptions::FileOpeningError(path);
 	extractfile();
 	this->config_file_fd.close();
-	printfile();
+	//printfile();
 	check_errors();
 	get_server_fields();
 }
