@@ -28,7 +28,7 @@ clean:
 
 
 test: all 
-	./${NAME} & sleep  1 && curl http://localhost:9997/api
+	./${NAME} & sleep  1 && curl http://localhost:9995/api
 	@echo "Testing done."
 
 fclean: clean
