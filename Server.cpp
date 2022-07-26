@@ -19,7 +19,8 @@ void Server::connect_servers(void)
 		// Non-blocking socket, only on MacOS
 		fcntl(servers[i].server_fd, F_SETFL, O_NONBLOCK);
 
-		if (setsockopt(servers[i].server_fd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
+		int optval = 1;
+		if (setsockopt(servers[i].server_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
 			throw std::runtime_error("Failed to set options");
 
 		bzero(&servers[i].address, sizeof(servers[i].address));
@@ -58,7 +59,7 @@ bool Server::canBind(int port)
 void Server::handle_listen(int i)
 {
 	sockaddr_storage client_addr;
-	socklen_t addrlen = sizeof(client_addr)
+	socklen_t addrlen = sizeof(client_addr);
 
 	int client_fd = accept(fds[i].fd, (struct sockaddr*)&client_addr, &addrlen);
 
@@ -102,19 +103,19 @@ void Server::run(void)
 
 	while (true)
 	{
-		if ((ret = poll(&(fds.front), fds.size, 10000)) <= 0)
+		if ((ret = poll(&(fds.front()), fds.size(), 10000)) <= 0)
 		{
 			if (ret == 0)
 				throw std::runtime_error("Request Timeout [408]");
 			if (ret == -1)
-				throw std::runtime_error("Internal Server Error [500]")
+				throw std::runtime_error("Internal Server Error [500]");
 		}
 
 		std::vector<pollfd>::iterator it;
 		for (it = fds.begin(); it != fds.end(); it++)
 		{
 			if (it->revents & POLLIN) {
-				for (size_t i = 0; i < fds.size; i++) {
+				for (size_t i = 0; i < fds.size(); i++) {
 					if (it->fd == fds[i].fd)
 						handle_listen(i);
 					else
