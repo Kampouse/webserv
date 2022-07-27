@@ -89,11 +89,25 @@ void Server::handle_client(std::vector<pollfd>::iterator& it, int i)
 	else
 	{
 		for (size_t j = 0; j < nbytes; j++)
-			str_buffer.push_back(buf[j]);
+			request.push_back(buf[j]);
 
-		// send response here
+		// Request parsing
+
+		std::string header = ""; // Get Request Header
+		std::string body = ""; // Get Request Body
+
+		size_t size = header.length() + body.length() + 1;
+
+		char * buffer = new char[size];
+		bzero(buffer, size);
+
+		memcpy(buffer, header.data(), header.length());
+		memcpy(buffer + header.length(), body.data(), body.length());
+
+		send(sender_fd, buffer, size, 0);
+		delete[] buffer;
 		bzero(buf, 4096);
-		str_buffer.clear();
+		request.clear();
 	}
 }
 

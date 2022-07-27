@@ -25,7 +25,7 @@ class Server
 		std::vector<server_info>	servers;
 		std::vector<int>			binded_ports;
 		std::vector<pollfd>			fds;
-		std::string					str_buffer;
+		std::string					request;
 
 
 		bool canBind(int port);
