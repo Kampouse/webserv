@@ -4,18 +4,22 @@
 #include <string>
 #include "map"
 
+static std::string trim(const std::string& str)
+{
+    size_t first = str.find_first_not_of("\n \r\t");
+    if (first == std::string::npos)
+        return str;
+    size_t last = str.find_last_not_of("\n \r\t");
+    return str.substr(first, (last - first + 1));
+}
 request::request(std::string&request_string): _request_string(request_string)
 {
-	using std::string;
-
-	std::map<string,string> req_map;
-
+	std::map<std::string,std::string> req_map;
 	std::string::iterator it; 
 	std::string::iterator it_second;
 	std::string key;
 	std::string value;
 	it = request_string.begin();
-
 	while (it != request_string.end())
 	{
 		if (*it == ' ')
@@ -37,37 +41,12 @@ request::request(std::string&request_string): _request_string(request_string)
 		it++;
 	}
 	_location = request_string.substr(it_second - request_string.begin(), it - it_second);
-	_version = request_string.substr(request_string.find ("HTTP/1.1"));
-
+	_version =   trim(request_string.substr(request_string.find ("HTTP") , request_string.find ("Host") - request_string.find ("HTTP")));
 	int temp  =  request_string.find ("\r\n") + 2;
 	it = request_string.begin() + temp;
 	it_second = it;
-/*
-	while(it != request_string.end())
-	{
-		if (*it == ':')
-		{
-			it++;
-			break;
-		}
-		it++;
-	}
-	key =	request_string.substr(it_second - request_string.begin(), it - it_second - 1);
-	it_second = it + 1;
-	while(it != request_string.end())
-	{
-		if (*it == '\r')
-		{
-			it++;
-			break;
-		}
-		it++;
-	}
-*/
-
 	unsigned long i  = temp;
 	unsigned long j  = temp;
-
 	std::vector <std::string> result;
 	while (i < _request_string.length() && j < _request_string.length())
 	{
@@ -79,17 +58,14 @@ request::request(std::string&request_string): _request_string(request_string)
 			result.push_back(str);
 		j = _request_string.find_first_not_of("\r\n", i);
 	}
-// dispaly_vetctor 
 	for (std::vector<std::string>::iterator it = result.begin(); it != result.end(); ++it)
 	{
-
 		std::string str = *it;
-
 		if (str.find(":") != std::string::npos)
 		{
 			 key = str.substr(0 , str.find(":"));
 			value = str.substr(str.find(":") + 1);
-			_req_map[ key ] = value;
+			_req_map[key] = trim(value);
 		}
 	}
 }
@@ -97,18 +73,12 @@ request::request(std::string&request_string): _request_string(request_string)
 void request::dispaly_map(void)
 {
 	std::map<std::string, std::string>::iterator it;
+	std::cout << _version << std::endl;
 	for (it = _req_map.begin(); it != _req_map.end(); it++)
-	{
-		std::cout << ":->" << it->first << "<-:->" << it->second << "<-"  <<std::endl;
-	}
+		std::cout << "key:-> " << it->first << "value:-> " << it->second  << std::endl;
 }
 
-
-request::request(void): _request_string ("")
-{
-
-}
-
+request::request(void): _request_string (""){}
 
 request::~request(void)
 {
