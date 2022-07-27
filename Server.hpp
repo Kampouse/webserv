@@ -40,4 +40,6 @@ class Server
 
 		void connect_servers(void);
 		void run(void);
+
+		void printServers(void);
 };

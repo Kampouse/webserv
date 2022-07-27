@@ -7,6 +7,8 @@ Server::Server(std::string path)
 {
 	parser Parsing(path);
 	servers = Parsing.getServers();
+	printServers();
+	exit(0);
 }
 
 void Server::connect_servers(void)
@@ -137,4 +139,69 @@ void Server::run(void)
 			}
 		}
 	}
+}
+
+void Server::printServers(void)
+{
+	std::vector<server_info>::iterator it = servers.begin();
+	for (; it != servers.end(); it++) {
+		std::cout << "\n-------------------------------\n\n";
+		std::cout << "host : " << it->host << "\n";
+		std::cout << "port : " << it->port << "\n";
+
+		std::cout << "server_names : " << it->server_names << "\n";
+
+		std::cout << "error_pages : ";
+		if (it->error_pages.size() == 0)
+			std::cout << "undefined\n";
+		else {
+			std::cout << "\n";
+			std::map<int, std::string>::iterator mit = it->error_pages.begin();
+			for (; mit != it->error_pages.end(); mit++) {
+				std::cout << "    " << mit->first << " " << mit->second << "\n";
+			}
+		}
+
+		std::cout << "client_max_body_size : " << it->client_max_body_size << "\n";
+		std::cout << "server_fd : " << it->server_fd << "\n";
+
+		std::cout << "locations : ";
+		if (it->locations.size() == 0)
+			std::cout << "undefined\n";
+		else {
+			std::cout << "\n";
+			std::map<std::string, location_info>::iterator mit2 = it->locations.begin();
+			for (; mit2 != it->locations.end(); mit2++) {
+				std::cout << mit2->first << "\n";
+				std::cout << "    root : " << mit2->second.root << "\n";
+				std::cout << "    index : " << mit2->second.index << "\n";
+				std::cout << "    upload_dir : " << mit2->second.upload_dir << "\n";
+				std::cout << "    autoindex : " << ((mit2->second.autoindex) ? "true" : "false") << "\n";
+
+				std::cout << "    cgi : ";
+				if (mit2->second.cgi.size() == 0)
+					std::cout << "undefined\n";
+				else {
+					std::cout << "\n";
+					std::map<std::string, std::string>::iterator mit3 = mit2->second.cgi.begin();
+					for (; mit3 != mit2->second.cgi.end(); mit3++) {
+						std::cout << "        " << mit3->first << " " << mit3->second << "\n";
+					}
+				}
+
+				std::cout << "    allowed_requests : ";
+				if (mit2->second.allowed_requests.size() == 0)
+					std::cout << "undefined\n";
+				else {
+					std::cout << "\n";
+					std::vector<std::string>::iterator it2 = mit2->second.allowed_requests.begin();
+					for (; it2 != mit2->second.allowed_requests.end(); it2++) {
+						std::cout << "        " << *it2 << "\n";
+					}
+				}
+			}
+		}
+	}
+
+	std::cout << "\n-------------------------------\n";
 }
