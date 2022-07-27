@@ -98,14 +98,13 @@ void Server::handle_client(std::vector<pollfd>::iterator& it, int i)
 
 		size_t size = header.length() + body.length() + 1;
 
-		char * buffer = new char[size];
+		char buffer[size];
 		bzero(buffer, size);
 
 		memcpy(buffer, header.data(), header.length());
 		memcpy(buffer + header.length(), body.data(), body.length());
 
 		send(sender_fd, buffer, size, 0);
-		delete[] buffer;
 		bzero(buf, 4096);
 		request.clear();
 	}
