@@ -26,11 +26,13 @@ class Server
 		std::vector<int>			binded_ports;
 		std::vector<pollfd>			fds;
 		std::string					request;
+		int							client_fd;
+		sockaddr_storage client_addr;
 
 
 		bool canBind(int port);
 
-		void handle_listen(int i);
+		void handle_listen(std::vector<pollfd>::iterator& it);
 		void handle_client(std::vector<pollfd>::iterator& it, int i);
 
 	public:
