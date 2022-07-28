@@ -28,10 +28,10 @@ class parser
 		void manage_locations(std::vector<std::string>::iterator it);
 
 	public:
+		std::vector<server_info>&get_servers(void);
 		parser();
 		parser(std::string _path);
 		~parser();
-
 		std::vector<server_info> getServers();
 
 		void printfile(void);

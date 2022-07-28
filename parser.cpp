@@ -60,8 +60,6 @@ void parser::check_errors(void) {
 	std::vector<std::string>::iterator it = ext_file.begin();
 
 	while (it != ext_file.end()) {
-		// std::cout << "Reached\n";
-		// std::cout << *it << "\n";
 		// this line assume that the config file is well formed
 		if (*it == "server" && bracket_state != 0)
 			throw Exceptions::NestedServerError();
@@ -229,4 +227,8 @@ void parser::printfile(void)
 	std::vector<std::string>::iterator it = ext_file.begin();
 	while (it != ext_file.end())
 		std::cout << *it++ << "\n";
+}
+std::vector<server_info>&parser::get_servers(void)
+{
+	return servers;
 }

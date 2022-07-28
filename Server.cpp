@@ -78,7 +78,7 @@ void Server::handle_client(std::vector<pollfd>::iterator& it, int i)
 {
 	char buf[4096];
 	int sender_fd = fds[i].fd;
-	int nbytes = recv(sender_fd, buf, 4096, 0);
+	size_t nbytes = recv(sender_fd, buf, 4096, 0);
 
 	if (nbytes <= 0)
 	{
@@ -110,6 +110,11 @@ void Server::handle_client(std::vector<pollfd>::iterator& it, int i)
 		bzero(buf, 4096);
 		request.clear();
 	}
+}
+
+std::vector<server_info>& Server::get_servers(void)
+{
+	return (servers);
 }
 
 void Server::run(void)

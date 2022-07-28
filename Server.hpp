@@ -38,6 +38,8 @@ class Server
 		Server(std::string path);
 		~Server();
 
+		std::vector<server_info>& getServers();
+
 		void connect_servers(void);
 		void run(void);
 
