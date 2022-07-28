@@ -70,16 +70,29 @@ int request_fn(bool callback)
 		recv (new_socket, buffer, 30000, 0);
 		return (0);
 }
-int main()
+int main(int argc, char **argv)
 {
-	Server server("./default.conf");
-	server_info temp =  server.get_servers()[0]; 
+	if (argc <= 2)
+	{
+		try {
+			std::string path;
+			path = (argc == 1) ? "./default.conf" : std::string(argv[1]);
+			Server servers(path);
+			servers.connect_servers();
+			// servers.run();
+		} catch (std::exception &e) {
+			std::cout << e.what();
+			return EXIT_FAILURE;
+		}
+	}
+	else
+	{
+		std::cout << "Too many arguments\n";
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
 
 	
-	//print  map of servers
-	//std::map<std::string, server_info>::iterator it;
-	request_fn(true);
-		
-	return 0;
+	// request_fn(true);		
 }
 

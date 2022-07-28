@@ -7,7 +7,7 @@ Server::Server(std::string path)
 {
 	parser Parsing(path);
 	servers = Parsing.getServers();
-	printServers();
+	// printServers();
 	exit(0);
 }
 
@@ -112,7 +112,7 @@ void Server::handle_client(std::vector<pollfd>::iterator& it, int i)
 	}
 }
 
-std::vector<server_info>& Server::get_servers(void)
+std::vector<server_info>& Server::getServers(void)
 {
 	return (servers);
 }
