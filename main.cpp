@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 			path = (argc == 1) ? "./default.conf" : std::string(argv[1]);
 			Server servers(path);
 			servers.connect_servers();
-			// servers.run();
+			servers.run();
 		} catch (std::exception &e) {
 			std::cout << e.what();
 			return EXIT_FAILURE;

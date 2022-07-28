@@ -7,8 +7,6 @@ Server::Server(std::string path)
 {
 	parser Parsing(path);
 	servers = Parsing.getServers();
-	// printServers();
-	exit(0);
 }
 
 void Server::connect_servers(void)
@@ -19,11 +17,11 @@ void Server::connect_servers(void)
 			throw std::runtime_error("Socket failed");
 
 		// Non-blocking socket, only on MacOS
-		fcntl(servers[i].server_fd, F_SETFL, O_NONBLOCK);
+		// fcntl(servers[i].server_fd, F_SETFL, O_NONBLOCK);
 
-		int optval = 1;
-		if (setsockopt(servers[i].server_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
-			throw std::runtime_error("Failed to set options");
+		// int optval = 1;
+		// if (setsockopt(servers[i].server_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0)
+		// 	throw std::runtime_error("Failed to set options");
 
 		bzero(&servers[i].address, sizeof(servers[i].address));
 		servers[i].address.sin_family = AF_INET;
@@ -33,6 +31,7 @@ void Server::connect_servers(void)
 		if (canBind(servers[i].port)) {
 			if (bind(servers[i].server_fd, (struct sockaddr *)&servers[i].address, sizeof(servers[i].address)) < 0)
 				throw std::runtime_error("Bind failed");
+			binded_ports.push_back(servers[i].port);
 		}
 
 		if (listen(servers[i].server_fd, 10) < 0)
@@ -119,30 +118,54 @@ std::vector<server_info>& Server::getServers(void)
 
 void Server::run(void)
 {
-	int ret;
+	int ret, new_socket, server_fd;
+	ssize_t valread;
+	struct sockaddr_in address;
+	int addrlen = sizeof(address);
+	std::string hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 
 	while (true)
 	{
-		if ((ret = poll(&(fds.front()), fds.size(), 10000)) <= 0)
+		std::cout << "\n+++++++ Waiting for new connection ++++++++\n\n";
+
+		if ((new_socket = accept(servers[1].server_fd, (struct sockaddr *)&servers[1].address, (socklen_t*)&addrlen)) < 0)
 		{
-			if (ret == 0)
-				throw std::runtime_error("Request Timeout [408]");
-			if (ret == -1)
-				throw std::runtime_error("Internal Server Error [500]");
+			perror("In accept");
+			exit(EXIT_FAILURE);
 		}
 
-		std::vector<pollfd>::iterator it;
-		for (it = fds.begin(); it != fds.end(); it++)
-		{
-			if (it->revents & POLLIN) {
-				for (size_t i = 0; i < fds.size(); i++) {
-					if (it->fd == fds[i].fd)
-						handle_listen(i);
-					else
-						handle_client(it, i);
-				}
-			}
-		}
+		char buffer[30000] = {0};
+
+		// this is the buffer that will be used to store the data received from the client
+		valread = recv( new_socket , buffer, 30000, 0);
+		std::cout << buffer << "\n";
+
+		// here we will parse the data received from the client and store it in a vector of strings
+		// and send back the right response to the client
+		send(new_socket, hello.c_str(), hello.length(), 0);
+		std::cout << "------------------Hello message sent-------------------\n";
+
+		close(new_socket);
+		// if ((ret = poll(&(fds.front()), fds.size(), 10000)) <= 0)
+		// {
+		// 	if (ret == 0)
+		// 		throw std::runtime_error("Request Timeout [408]");
+		// 	if (ret == -1)
+		// 		throw std::runtime_error("Internal Server Error [500]");
+		// }
+
+		// std::vector<pollfd>::iterator it;
+		// for (it = fds.begin(); it != fds.end(); it++)
+		// {
+		// 	if (it->revents & POLLIN) {
+		// 		for (size_t i = 0; i < fds.size(); i++) {
+		// 			if (it->fd == fds[i].fd)
+		// 				handle_listen(i);
+		// 			else
+		// 				handle_client(it, i);
+		// 		}
+		// 	}
+		// }
 	}
 }
 
