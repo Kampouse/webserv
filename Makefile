@@ -25,11 +25,8 @@ val: all
 clean:
 	    ${RM} ${OBJS}
 
-
-
 test: all 
-	./${NAME} & sleep  1 && curl http://localhost:9995/api
-	@echo "Testing done."
+	./${NAME} & sleep  1 && http :9991  
 
 fclean: clean
 	@${RM} ${NAME}

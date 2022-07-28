@@ -11,7 +11,7 @@
 #include <vector>
 #include <exception>
 #define PORT 9991
-int request_fn(bool callback) 
+int request_fn(bool callback,Server&server_ptr) 
 {
  	parser  parser;
     int server_fd, new_socket; 
@@ -51,13 +51,14 @@ int request_fn(bool callback)
 		recv (new_socket, buffer, 30000, 0);
 		std::string request_string(buffer);
 		request request(request_string);
-		request.find_host(std::string("HOst"));
 		std :: cout << "---------------"  << std::endl;
 		request.dispaly_map();
+
+		(void) server_ptr;
+		
+	std::vector<server_info> servers = server_ptr.get_servers();
+		request.request_handler(server_ptr.get_servers());
 		std :: cout << "---------------"  << std::endl;
-		std::vector<server_info> servers =  parser.get_servers();
-		// here we will parse the data received from the client and store it in a vector of strings
-		// and send back the right response to the client
 		send (new_socket , hello , strlen(hello) , 0 );
         printf("------------------Hello message sent-------------------\n");
         close(new_socket);
@@ -73,13 +74,8 @@ int request_fn(bool callback)
 int main()
 {
 	Server server("./default.conf");
-	server_info temp =  server.get_servers()[0]; 
-
-	
-	//print  map of servers
-	//std::map<std::string, server_info>::iterator it;
-	request_fn(true);
-		
+	std::cout << server.get_servers().size();	
+	request_fn(true,server);
 	return 0;
 }
 

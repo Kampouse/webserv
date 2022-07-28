@@ -179,6 +179,7 @@ void parser::get_server_fields(void)
 				if (std::count(data.begin(), data.end(), ':') != 1)
 					throw Exceptions::InvalidFieldError("listen");
 				pos = data.find(':');
+
 				servers.back().host = data.substr(0, pos);
 				data = data.substr(pos + 1, std::string::npos);
 				servers.back().port = atoi(data.c_str());
@@ -220,7 +221,7 @@ void parser::parsefile(std::string path)
 	get_server_fields();
 }
 
-std::vector<server_info> parser::getServers() { return (servers); }
+std::vector<server_info>&parser::getServers() { return (servers); }
 
 void parser::printfile(void)
 {

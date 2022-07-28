@@ -97,10 +97,7 @@ void Server::handle_client(std::vector<pollfd>::iterator& it, int i)
 	}
 }
 
-std::vector<server_info>& Server::get_servers(void)
-{
-	return (servers);
-}
+std::vector<server_info>&Server::get_servers(void){ return (servers); }
 
 void Server::run(void)
 {
