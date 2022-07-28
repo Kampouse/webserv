@@ -201,7 +201,7 @@ void parser::get_server_fields(void)
 				if (!std::isdigit(data[0]))
 					throw Exceptions::InvalidFieldError("error_page");
 				servers.back().error_pages.insert(std::pair<int, std::string>(atoi(data.c_str()), \
-										data.substr(data.find_last_of(WHITESPACES), std::string::npos)));
+										data.substr(data.find_last_of(WHITESPACES) + 1, std::string::npos)));
 			}
 			else
 				throw Exceptions::UnknownFieldError();
@@ -216,7 +216,7 @@ void parser::parsefile(std::string path)
 		throw Exceptions::FileOpeningError(path);
 	extractfile();
 	this->config_file_fd.close();
-	//printfile();
+	// printfile();
 	check_errors();
 	get_server_fields();
 }
