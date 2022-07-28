@@ -1,3 +1,4 @@
+
 #include <iostream> 
 #include "Server.hpp" 
 #include "request.hpp" 
@@ -11,7 +12,7 @@
 #include <vector>
 #include <exception>
 #define PORT 9991
-int request_fn(bool callback,Server&server_ptr) 
+int request_fn(bool callback) 
 {
  	parser  parser;
     int server_fd, new_socket; 
@@ -53,12 +54,11 @@ int request_fn(bool callback,Server&server_ptr)
 		request request(request_string);
 		std :: cout << "---------------"  << std::endl;
 		request.dispaly_map();
-
-		(void) server_ptr;
-		
-	std::vector<server_info> servers = server_ptr.get_servers();
-		request.request_handler(server_ptr.get_servers());
 		std :: cout << "---------------"  << std::endl;
+		std::vector<server_info> servers =  parser.get_servers();
+		request.find_host_index(servers) ;
+		// here we will parse the data received from the client and store it in a vector of strings
+		// and send back the right response to the client
 		send (new_socket , hello , strlen(hello) , 0 );
         printf("------------------Hello message sent-------------------\n");
         close(new_socket);
@@ -71,11 +71,26 @@ int request_fn(bool callback,Server&server_ptr)
 		recv (new_socket, buffer, 30000, 0);
 		return (0);
 }
-int main()
+int main(int argc, char **argv)
 {
-	Server server("./default.conf");
-	std::cout << server.get_servers().size();	
-	request_fn(true,server);
-	return 0;
+	if (argc <= 2)
+	{
+		try {
+			std::string path;
+			path = (argc == 1) ? "./default.conf" : std::string(argv[1]);
+			Server servers(path);
+			servers.connect_servers();
+			 servers.run();
+		} catch (std::exception &e) {
+			std::cout << e.what();
+			return EXIT_FAILURE;
+		}
+	}
+	else
+	{
+		std::cout << "Too many arguments\n";
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
+	// request_fn(true);		
 }
-
