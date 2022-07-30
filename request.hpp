@@ -2,6 +2,7 @@
 # define REQUEST_HPP
 
 # include <iostream>
+# include "config_structs.hpp" 
 # include "map"
 
 class request
@@ -20,6 +21,8 @@ class request
 		request(const request &copy);
 		request	&operator = (const request &copy);
 		void	find_host(std::string string) ;
+		int		find_host_index(std::vector<server_info>&server) ;
+		int		request_handler(std::vector<server_info>&server);
 		void	dispaly_map(void);
 };
 
