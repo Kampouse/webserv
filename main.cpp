@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <vector>
 #include <exception>
+
 #define PORT 9991
 int request_fn(bool callback) 
 {
@@ -56,7 +57,6 @@ int request_fn(bool callback)
 		request.dispaly_map();
 		std :: cout << "---------------"  << std::endl;
 		std::vector<server_info> servers =  parser.get_servers();
-		request.find_host_index(servers) ;
 		// here we will parse the data received from the client and store it in a vector of strings
 		// and send back the right response to the client
 		send (new_socket , hello , strlen(hello) , 0 );
@@ -71,26 +71,14 @@ int request_fn(bool callback)
 		recv (new_socket, buffer, 30000, 0);
 		return (0);
 }
-int main(int argc, char **argv)
+int main()
 {
-	if (argc <= 2)
-	{
-		try {
-			std::string path;
-			path = (argc == 1) ? "./default.conf" : std::string(argv[1]);
-			Server servers(path);
-			servers.connect_servers();
-			 servers.run();
-		} catch (std::exception &e) {
-			std::cout << e.what();
-			return EXIT_FAILURE;
-		}
-	}
-	else
-	{
-		std::cout << "Too many arguments\n";
-		return EXIT_FAILURE;
-	}
-	return EXIT_SUCCESS;
-	// request_fn(true);		
+	Server server("./default.conf");
+
+	
+	//print  map of servers
+	//std::map<std::string, server_info>::iterator it;
+	request_fn(true);
+		
+	return 0;
 }
