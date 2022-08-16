@@ -28,24 +28,29 @@
 
 
 class response;
+
 class   server {
 
 	public:
-			std::vector<pollfd> poll_set;
-		   struct sockaddr_in server_addr;
-		   server_info serveInfo;
-		   int server_fd;
-		   response resp;
+		std::vector<pollfd> poll_set;
+		struct sockaddr_in server_addr;
+		server_info serveInfo;
+		int server_fd;
+		response resp;
+	
 		server(){};
 		server( struct server_info serv);
 		server(std::string path);
 		~server(){};
+	
 		void add_client(void);
 		void clear_fd(int i);
 		void get_data_from_client(int i);
 		void get_data_from_server(int i);
 		void run();
+
 		std::string response_to_client(location_info &local_info);
+
 	private :
 		std::vector<std::string> contents;
 

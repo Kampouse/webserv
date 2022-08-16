@@ -24,49 +24,57 @@ struct location_info {
 	location_info() {
 		autoindex = false;
 	}
+
 	location_info(std::string rooted) {
 		autoindex = false;
 		root = rooted;
 	}
 
-	std::string find_error_page(std::string path)const {
-   std::string data;
-   std::ifstream file(path.c_str());
-   std::string line;
-   while (std::getline(file, line)){
-	  data += line;
-   }
-   file.close();
-	return data;
-}
-	std::string find_content()const {
+	std::string find_error_page(std::string path) const
+	{
+		std::string data;
+		std::ifstream file(path.c_str());
+		std::string line;
 
-   //open file and read it into a string
-   std::string data;
-   std::string file_path = root + "/" +  index;
-   std::ifstream file(file_path.c_str());
-   std::string line;
-   while (std::getline(file, line)){
-	  data += line;
-   }
-   file.close();
-	return data;
-}
- std::string find_type() const
-{
-	std::string type = "text/" + this->index.substr(index.find(".") + 1);
-	return type;
-}
+		while (std::getline(file, line)){
+			data += line;
+		}
 
-friend	std::ostream &operator<<(std::ostream &os , const location_info &test)  {
-	time_t rawtime;
-    struct tm * timeinfo;
-    char buffer[80];
-    time (&rawtime);
-    timeinfo = localtime(&rawtime);
-    strftime(buffer,80,"%a, %b %d %H:%M:%S %Y",timeinfo);
+		file.close();
+		return data;
+	}
 
-	std::string time(buffer);
+	std::string find_content() const
+	{
+		//open file and read it into a string
+		std::string data;
+		std::string file_path = root + "/" +  index;
+		std::ifstream file(file_path.c_str());
+		std::string line;
+
+		while (std::getline(file, line)){
+			data += line;
+		}
+
+		file.close();
+		return data;
+	}
+
+	std::string find_type() const
+	{
+		std::string type = "text/" + this->index.substr(index.find(".") + 1);
+		return type;
+	}
+
+	friend	std::ostream &operator<<(std::ostream &os , const location_info &test)  {
+		time_t rawtime;
+	    struct tm * timeinfo;
+	    char buffer[80];
+	    time (&rawtime);
+	    timeinfo = localtime(&rawtime);
+	    strftime(buffer,80,"%a, %b %d %H:%M:%S %Y",timeinfo);
+
+		std::string time(buffer);
 		std::string time_string = asctime(timeinfo);
 		time_string.erase(std::remove(time_string.begin(), time_string.end(), '\n'), time_string.end());
 		time_string.insert(time_string.find(' '), " - ");
@@ -87,7 +95,7 @@ friend	std::ostream &operator<<(std::ostream &os , const location_info &test)  {
 		std::cout << "content_length: " << test.find_content().length() << std::endl;
 		std::cout << "time: " << time << std::endl;
 		return os;
-	 	}
+	}
 };
 
 struct server_info {
