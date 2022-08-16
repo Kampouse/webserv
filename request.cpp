@@ -1,4 +1,5 @@
 #include "request.hpp"
+#include "Server.hpp" 
 #include "utils.hpp"
 #include <sstream>
 #include <string>
@@ -98,12 +99,42 @@ request	&request::operator = (const request &copy)
 	return (*this);
 }
 
- void request::find_host(std::string string) 
+ int request::find_host_index(std::vector<server_info>&server) 
 {
-	(void)string;
-	std::cout << "hello" <<  _req_map["Host"]  << std::endl;
+	for (std::vector<server_info>::iterator it = server.begin(); it != server.end(); ++it)
+	{
+		std::string temp  = _req_map["Host"];
+		temp = temp.substr(temp.find(":") + 1);
+		if  (temp != "")
+		{
+			std::cout <<  atoi(temp.c_str()) << "<-> " << it->port << std::endl;
+			 if( atoi(temp.c_str())  == it->port)
+				return (it - server.begin());
+		}
+		if (it->host == _req_map["Host"] )
+			return (it - server.begin());
 
+	}
+	return (-1);
 }
+int request::request_handler(std::vector<server_info>&server)
+{
+	int index = find_host_index(server);
+	if (index == -1)
+		return (-1);
+	 for (std::map<std::string, location_info>::iterator it = server[index].locations.begin(); it != server[index].locations.end(); ++it)
+	 {
+		 if(trim(it->first) == trim(_location))
+			std::cout << "hello "  << it->second.index << std::endl;
+	
+
+	 }
+	return(index);
+}
+
+
+
+
 
 
 

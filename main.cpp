@@ -1,3 +1,4 @@
+
 #include <iostream> 
 #include "Server.hpp" 
 #include "request.hpp" 
@@ -10,6 +11,7 @@
 #include <stdio.h>
 #include <vector>
 #include <exception>
+
 #define PORT 9991
 int request_fn(bool callback) 
 {
@@ -51,7 +53,6 @@ int request_fn(bool callback)
 		recv (new_socket, buffer, 30000, 0);
 		std::string request_string(buffer);
 		request request(request_string);
-		request.find_host(std::string("HOst"));
 		std :: cout << "---------------"  << std::endl;
 		request.dispaly_map();
 		std :: cout << "---------------"  << std::endl;
@@ -93,6 +94,9 @@ int main(int argc, char **argv)
 	return EXIT_SUCCESS;
 
 	
-	// request_fn(true);		
+	//print  map of servers
+	//std::map<std::string, server_info>::iterator it;
+	request_fn(true);
+		
+	return 0;
 }
-
