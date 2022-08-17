@@ -14,6 +14,8 @@
 #define WHITESPACES "\t\n\v\f\r "
 
 struct location_info {
+	std::string								redirect_to;
+	int 									redirect_code;
 	std::string							root;
 	std::map<std::string, std::string>	cgi;
 	std::vector<std::string>			allowed_requests;
@@ -22,12 +24,16 @@ struct location_info {
 	bool								autoindex;
 
 	location_info() {
+		redirect_to = "";
+		redirect_code = 0;
 		autoindex = false;
 	}
 
 	location_info(std::string rooted) {
 		autoindex = false;
 		root = rooted;
+		redirect_to = "";
+		redirect_code = 0;
 	}
 
 	std::string find_error_page(std::string path) const
@@ -102,7 +108,6 @@ struct server_info {
 	std::string								host;
 	int										port;
 	std::string								server_names;
-	std::string								redirect_to;
 	std::map<int, std::string>				error_pages;
 	unsigned int							client_max_body_size;
 	int										server_fd;
@@ -113,9 +118,7 @@ struct server_info {
 		client_max_body_size = 0;
 		port = 0;
 		server_fd = 0;
-
 		server_names = "localhost";
-		redirect_to = "";
 	}
 
 };
