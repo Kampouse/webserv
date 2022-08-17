@@ -148,7 +148,15 @@ void parser::manage_locations(std::vector<std::string>::iterator it)
 			}
 		}
 		else if (field == "return") {
-			;
+
+
+
+		unsigned int	field = data.find_first_of(WHITESPACES);
+			if (field > data.length())
+				throw Exceptions::InvalidFieldError("return");
+			std::string nbrs = trim(data.substr(0, field));
+			std::string type = trim(data.substr(field, data.length()));
+			std::cout << nbrs << type << std::endl;
 		}
 		else
 			throw Exceptions::UnknownFieldError();

@@ -71,6 +71,7 @@ void server::get_data_from_client(int i)
 	else
 	{
 		data = buf;
+		std::cout << data ;
 		std::string path = data.substr(data.find("/"), data.find("HTTP") - 4);
 		for (unsigned int i = 0; i < contents.size(); i++)
 		{
