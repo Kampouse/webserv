@@ -3,6 +3,11 @@
 #include <iterator>
 #include <sstream>
 #include <string>
+#include <algorithm>
+#if OS_LINUX
+#include <bits/stdc++.h>
+#endif
+
 #include <cstdlib>
 #include <exception>
 
@@ -84,8 +89,8 @@ void parser::check_errors(void) {
 
 		if (bracket_state == -1)
 			throw Exceptions::ConfigError();
-
-		if (state == CONFIG_FIELD && (*it).back() != ';')
+//hack might be broken 
+		if (state == CONFIG_FIELD && (*it).at((it)->length() - 1) != ';')
 			throw Exceptions::SemicolonError();
 		it++;
 	}
@@ -179,6 +184,7 @@ void parser::get_server_fields(void)
 				if (std::count(data.begin(), data.end(), ':') != 1)
 					throw Exceptions::InvalidFieldError("listen");
 				pos = data.find(':');
+
 				servers.back().host = data.substr(0, pos);
 				data = data.substr(pos + 1, std::string::npos);
 				servers.back().port = atoi(data.c_str());
@@ -200,7 +206,7 @@ void parser::get_server_fields(void)
 				if (!std::isdigit(data[0]))
 					throw Exceptions::InvalidFieldError("error_page");
 				servers.back().error_pages.insert(std::pair<int, std::string>(atoi(data.c_str()), \
-										data.substr(data.find_last_of(WHITESPACES), std::string::npos)));
+										data.substr(data.find_last_of(WHITESPACES) + 1, std::string::npos)));
 			}
 			else
 				throw Exceptions::UnknownFieldError();
@@ -215,12 +221,12 @@ void parser::parsefile(std::string path)
 		throw Exceptions::FileOpeningError(path);
 	extractfile();
 	this->config_file_fd.close();
-	//printfile();
+	// printfile();
 	check_errors();
 	get_server_fields();
 }
 
-std::vector<server_info> parser::getServers() { return (servers); }
+std::vector<server_info>&parser::getServers() { return (servers); }
 
 void parser::printfile(void)
 {
