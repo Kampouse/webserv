@@ -16,6 +16,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include <vector>
+<<<<<<< HEAD:Server.hpp
 #include"Exceptions.hpp"
 #include"config_structs.hpp"
 #include"parser.hpp"
@@ -25,10 +26,36 @@
 #define SERVER_PORT 8888
 #define EPOLL_SIZE 5000
 #define BUF_SIZE 0xFFFF
+=======
+#include <exception>
+#include <stdbool.h>
+#include <fcntl.h>
+
+#include "parser.hpp"
+#include "config_structs.hpp"
+#include "Exceptions.hpp"
+#include "utils.hpp"
+
+class Server
+{
+	private:
+		std::vector<server_info>	servers;
+		std::vector<int>			binded_ports;
+		std::vector<pollfd>			fds;
+		std::string					request;
+		int							client_fd;
+		sockaddr_storage client_addr;
+
+>>>>>>> origin/gasselin:Garbage/Server.hpp
 
 
+<<<<<<< HEAD:Server.hpp
 class response;
 class   server {
+=======
+		void handle_listen(std::vector<pollfd>::iterator& it);
+		void handle_client(std::vector<pollfd>::iterator& it, int i);
+>>>>>>> origin/gasselin:Garbage/Server.hpp
 
 	public:
 			std::vector<pollfd> poll_set;

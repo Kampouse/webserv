@@ -45,9 +45,33 @@ std::vector<server> servers_starter(std::vector<server_info>lst_config)
 	 }
 return(lst_servers);
 }
+<<<<<<< HEAD:main.cpp
 
 int main(void)
 {
+=======
+int main(int argc, char **argv)
+{
+	if (argc <= 2)
+	{
+		try {
+			std::string path;
+			path = (argc == 1) ? "./default.conf" : std::string(argv[1]);
+			Server servers(path);
+			servers.connect_servers();
+			servers.run();
+		} catch (std::exception &e) {
+			std::cout << e.what();
+			return EXIT_FAILURE;
+		}
+	}
+	else
+	{
+		std::cout << "Too many arguments\n";
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
+>>>>>>> origin/gasselin:Garbage/main.cpp
 
 	std::cout << "server as started! " << std::endl;
 

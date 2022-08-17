@@ -38,7 +38,7 @@ location_info find_page(server &serv, std::string &path)
 	return ( serv.serveInfo.locations[page]);
 }
 
- std::string content_typer(std::vector<std::string> &content_type,int index)
+std::string content_typer(std::vector<std::string> &content_type, int index)
 {
 	std::string content_type_str;
 	std::string temp;

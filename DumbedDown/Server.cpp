@@ -63,69 +63,57 @@ void server::add_client (void)
 
 void server::get_data_from_client(int i)
 {
-		char buf[BUF_SIZE];
-		std::string data;
-		int ret = recv(poll_set[i].fd, buf, BUF_SIZE, 0);
-		if(ret < 0){ return;}
-		else if(ret == 0){clear_fd(i);}
-		else
+	char buf[BUF_SIZE];
+	std::string data;
+	int ret = recv(poll_set[i].fd, buf, BUF_SIZE, 0);
+	if(ret < 0){ return; }
+	else if(ret == 0){ clear_fd(i); }
+	else
+	{
+		data = buf;
+		std::string path = data.substr(data.find("/"), data.find("HTTP") - 4);
+		for (unsigned int i = 0; i < contents.size(); i++)
 		{
-			data = buf;
-			std::string path = data.substr(data.find("/"), data.find("HTTP") - 4);
-			for (unsigned int i = 0; i < contents.size(); i++)
-		{
-           if (path.find(contents[i]) != std::string::npos)
-		   {
-			   std::string root_ext;
-			   if(contents[i] == ".css")
-				   root_ext = "/styles";
-			   else if(contents[i] == ".html")
-				    continue;
-			   else if(contents[i] == ".js")
-				   root_ext = "/scripts";
-			   else
-				   root_ext = "/images";
-			   std::cout << this->serveInfo.locations["/"].root + root_ext  << path << std::endl;
+			if (path.find(contents[i]) != std::string::npos)
+			{
+				std::cout << content_typer(contents,i) << std::endl;
+				std::string pathed = trim(this->serveInfo.locations["/"].root +  path);
+				std::ifstream file;
 
-			   std::cout << content_typer(contents,i) << std::endl;
-			   std::string pathed = trim(this->serveInfo.locations["/"].root + root_ext +  path);
-			   std::ifstream file;
-			   file.open(pathed.c_str());
-			   if (!file.is_open())
-			   {
-				   //  what to send to request when the content is not found
-				   std::cout << "file not found" << std::endl;
-			   }
-			   else
-			   {
-				   file.close();
-				   std::string content_type = content_typer(contents, i);
-				    resp = response(pathed, content_type);
+				file.open(pathed.c_str());
+				if (!file.is_open())
+				{
+					//  what to send to request when the content is not found
+					std::cout << "file not found" << std::endl;
+				}
+				else
+				{
+					file.close();
+					std::string content_type = content_typer(contents, i);
+					resp = response(pathed, content_type);
 					return;
-			   }
+				}
 			}
 		}
-			resp =  response(find_page(*this, data),this->serveInfo.error_pages,data);
-			//poll_set[i].revents = 0 | POLLOUT | POLLHUP | POLLERR;
-		}
+		resp = response(find_page(*this, data),this->serveInfo.error_pages,data);
+		//poll_set[i].revents = 0 | POLLOUT | POLLHUP | POLLERR;
+	}
 }
+
 void server::get_data_from_server(int i)
 {
 	std::string http_response =  resp.build_response();
 	int ret = send(poll_set[i].fd, http_response.c_str(), http_response.length(), 0);
-	if(ret < 0){ return;}
-	else if(ret == 0){clear_fd(i);}
-	else
-	{
-		clear_fd(i);
-	}
+
+	if (ret < 0) { return; }
+	else { clear_fd(i); }
+
 	std::cout << "closed" << std::endl;
-	(void)ret;
 }
 void server::run()
 {
-	poll (poll_set.data(),poll_set.size() , 50);
-	for(unsigned long i = 0; i <  poll_set.size();i++)
+	poll(poll_set.data(),poll_set.size(), 50);
+	for(unsigned long i = 0; i <  poll_set.size(); i++)
 	{
 		if(poll_set[i].revents & POLLIN)
 		{
@@ -140,7 +128,7 @@ void server::run()
 				}
 			}
 		}
-		if (poll_set[i].revents & POLLOUT )
+		if (poll_set[i].revents & POLLOUT)
 		{
 			get_data_from_server(i);
 		}

@@ -20,6 +20,7 @@ std::string  response::build_response(void)
 	int content_length;
 	std::stringstream ss;
 	std::string content_type ;
+	std::cout << status_code << "\n";
 	if(status_code != 200)
 	{
 		content  = 	local_info.find_error_page( error_page[status_code]);
@@ -59,23 +60,25 @@ std::string  response::build_response(void)
 	std::cout << response << std::endl;
 	response += content;
 	return response;
-	}
+}
 
-	response::response():path(""){}
-	response::response(std::string &path,std::string &type):path(path),type(type)
+response::response():path(""){}
+
+response::response(std::string &path,std::string &type):path(path),type(type)
+{
+	if (path == "")
 	{
-		if (path == "")
-		{
-			status_code = 404;
-			status = "404 Not Found";
-		}
-		else
-		{
-			status_code = 200;
-			status = "200 OK";
-		}
+		status_code = 404;
+		status = "404 Not Found";
 	}
-	response::response(location_info local_info,std::map<int,std::string> error_page, std::string &path):error_page(error_page),path(path)
+	else
+	{
+		status_code = 200;
+		status = "200 OK";
+	}
+}
+
+response::response(location_info local_info, std::map<int, std::string> error_page, std::string &path) : error_page(error_page), path(path)
 {
 	this->type = "";
 	this->local_info = local_info;
