@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstring>
 #include <iostream>
+#include <map>
 
 #include "Server.hpp"
 
@@ -17,6 +18,8 @@ class CGI {
 		std::string query;
 		std::string scriptName;
 
+		std::string getExecPath();
+
 	public:
 		CGI();
 		CGI(server_info info, std::pair<std::string, std::string> page);
@@ -24,4 +27,6 @@ class CGI {
 
 		void setExecArgs();
 		void setEnvVars();
+
+		void execCGI();
 };

@@ -11,15 +11,44 @@ CGI::CGI(server_info info, std::pair<std::string, std::string> page)
 	path = page.second.substr(0, pos);
 	query = page.second.substr(pos + 1, std::string::npos);
 	scriptName = path.substr(path.find_last_of('/') + 1, std::string::npos);
+	setEnvVars();
 	setExecArgs();
+	execCGI();
+}
+
+std::string CGI::getExecPath()
+{
+	std::string scriptExt = scriptName.substr(scriptName.find('.'), std::string::npos);
+
+	std::map<std::string, location_info>::iterator it = serverInfo.locations.begin();
+	std::map<std::string, std::string>::iterator cgi_it;
+	for (; it != serverInfo.locations.end(); it++) {
+		if ((cgi_it = it->second.cgi.find(scriptExt)) != it->second.cgi.end()) {
+			return (cgi_it->second);
+		}
+	}
+	std::cout << "Invalid File Extension\n";
+	return "";
 }
 
 void CGI::setExecArgs()
 {
+	size_t len;
 	args = new char*[3];
 
-	args[0] = new char[25]; // /usr/bin/ path
-	args[1] = new char[25]; // file path
+	std::string execPath; 
+	execPath = getExecPath();
+	if (execPath == "")
+		return ;
+	
+	len = execPath.length() + 1;
+	args[0] = new char[len];
+	strcpy(args[0], execPath.c_str());
+
+	len = path.length() + 1;
+	args[1] = new char[len];
+	strcpy(args[1], path.c_str());
+
 	args[2] = NULL;
 }
 
@@ -31,7 +60,7 @@ void CGI::setEnvVars()
 	vars.push_back("SERVER_NAME=" + serverInfo.server_names);
 	vars.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	vars.push_back("SERVER_PROTOCOL=HTTP/1.1");
-	//vars.push_back("SERVER_PORT=" + serverInfo.port);
+	vars.push_back("SERVER_PORT=" + IntToString( serverInfo.port));
 	vars.push_back("REQUEST_METHOD=" + request);
 	vars.push_back("PATH_INFO=./" + path);
 	vars.push_back("PATH_TRANSLATED=./" + path);
@@ -44,7 +73,26 @@ void CGI::setEnvVars()
 	envp = new char*[14];
 	envp[13] = NULL;
 
-	// Convert string into char
+	size_t i = 0;
+	size_t len;
+	for ( std::vector<std::string>::iterator it = vars.begin(); it != vars.end(); it++, i++) {
+		len = it->length() + 1;
+		envp[i] = new char[len];
+		strcpy(envp[i], it->c_str());
+	}
 
 	vars.clear();
+}
+
+void CGI::execCGI()
+{
+	execve(args[0], args, envp);
+
+	delete[] args[0];
+	delete[] args[1];
+	delete[] args;
+
+	for (size_t i = 0; i < 14; i++)
+		delete[] envp[i];
+	delete[] envp;
 }
