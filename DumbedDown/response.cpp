@@ -31,7 +31,6 @@ std::string  response::build_response(void)
 	else if(status_code == 200 && type == "")
 	{
 		content = local_info.find_content();
-
 		content_length = content.length();
 		content_type = local_info.find_type();
 	}

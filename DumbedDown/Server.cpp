@@ -84,7 +84,7 @@ void server::get_data_from_client(int i)
 				file.open(pathed.c_str());
 				if (!file.is_open())
 				{
-					//  what to send to request when the content is not found
+
 					std::cout << "file not found" << std::endl;
 				}
 				else
@@ -96,6 +96,23 @@ void server::get_data_from_client(int i)
 				}
 			}
 		}
+std::cout << "i am path" << path << std::endl;
+//iterate through the locations and find the path
+
+for(std::map<std::string, location_info>::iterator it = serveInfo.locations.begin(); it != serveInfo.locations.end(); ++it)
+{
+
+	if(it->first == path)
+		std::cout << "i am path" << path << std::endl;
+  std::cout << "i am redir to "  << it->second.redirect_to  << std::endl;
+
+
+}
+
+
+
+
+
 		resp = response(find_page(*this, data),this->serveInfo.error_pages,data);
 		//poll_set[i].revents = 0 | POLLOUT | POLLHUP | POLLERR;
 	}
