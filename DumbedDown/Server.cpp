@@ -96,23 +96,19 @@ void server::get_data_from_client(int i)
 				}
 			}
 		}
-std::cout << "i am path" << path << std::endl;
-//iterate through the locations and find the path
+	//iterate through the locations and find the path
+		
+	for(std::map<std::string, location_info>::iterator it = serveInfo.locations.begin(); it != serveInfo.locations.end(); ++it)
+	{
 
-for(std::map<std::string, location_info>::iterator it = serveInfo.locations.begin(); it != serveInfo.locations.end(); ++it)
-{
-
-	if(it->first == path)
-		std::cout << "i am path" << path << std::endl;
-  std::cout << "i am redir to "  << it->second.redirect_to  << std::endl;
-
-
-}
-
-
-
-
-
+		if(it->first == trim( path) && it->second.redirect_to != "")
+				{
+					std::cout << "i am path" << path << std::endl;
+					std::cout << "i am redir to "  << it->second.redirect_to  << std::endl;
+					resp = response(serveInfo.locations[it->second.redirect_to] ,this->serveInfo.error_pages,data);
+					return;
+				}
+	}
 		resp = response(find_page(*this, data),this->serveInfo.error_pages,data);
 		//poll_set[i].revents = 0 | POLLOUT | POLLHUP | POLLERR;
 	}
