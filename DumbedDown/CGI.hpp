@@ -4,8 +4,10 @@
 #include <vector>
 #include <cstring>
 #include <iostream>
+#include <map>
 
 #include "server.hpp"
+#include "utils.hpp"
 
 class CGI {
 	private:
@@ -16,6 +18,8 @@ class CGI {
 		std::string path;
 		std::string query;
 		std::string scriptName;
+
+		std::string getExecPath();
 
 	public:
 		CGI();
