@@ -28,4 +28,6 @@ class CGI {
 
 		void setExecArgs();
 		void setEnvVars();
+
+		void execCGI();
 };

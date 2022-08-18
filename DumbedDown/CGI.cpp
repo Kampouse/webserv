@@ -11,7 +11,9 @@ CGI::CGI(server_info info, std::pair<std::string, std::string> page)
 	path = page.second.substr(0, pos);
 	query = page.second.substr(pos + 1, std::string::npos);
 	scriptName = path.substr(path.find_last_of('/') + 1, std::string::npos);
+	setEnvVars();
 	setExecArgs();
+	execCGI();
 }
 
 std::string CGI::getExecPath()
@@ -71,7 +73,28 @@ void CGI::setEnvVars()
 	envp = new char*[14];
 	envp[13] = NULL;
 
-	// Convert string into char
+	std::vector<std::string>::iterator it = vars.begin();
+	size_t i = 0;
+	size_t len;
+
+	for (; it != vars.end(); it++, i++) {
+		len = it->length() + 1;
+		envp[i] = new char[len];
+		strcpy(envp[i], it->c_str());
+	}
 
 	vars.clear();
+}
+
+void CGI::execCGI()
+{
+	execve(args[0], args, envp);
+
+	delete[] args[0];
+	delete[] args[1];
+	delete[] args;
+
+	for (size_t i = 0; i < 14; i++)
+		delete[] envp[i];
+	delete[] envp;
 }
