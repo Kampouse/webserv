@@ -11,9 +11,10 @@
     return str.substr(first, (last - first + 1));
 }
 
-location_info find_page(server &serv, std::string &path)
+std::pair<std::string, std::string> find_page(server &serv, std::string &path)
 {
-	unsigned long pos = -1;
+	(void) serv;
+	size_t pos = 0;
 	std::vector <std::string> allowed_requests;
 	allowed_requests.push_back("GET");
 	allowed_requests.push_back("POST");
@@ -21,11 +22,11 @@ location_info find_page(server &serv, std::string &path)
 	allowed_requests.push_back("PUT");
 	allowed_requests.push_back("DELETE");
 	 //refactor to  avoid this
-	for (unsigned int i = 0; i < allowed_requests.size(); i++)
+	for (size_t i = 0; i < allowed_requests.size(); i++)
 	{
 		if (path.find(allowed_requests[i]) != std::string::npos)
 		{
-			pos  = i;
+			pos = i;
 			break;
 		}
 	}
@@ -33,9 +34,8 @@ location_info find_page(server &serv, std::string &path)
 	std::string::size_type  end =  path.find("HTTP") - 4;
 	std::string page = path.substr(start + allowed_requests[pos].size(), end);
 	std::string::size_type  start_page =  page.find("/");
-	std::ifstream file;
 	page = page.substr(start_page, end);
-	return ( serv.serveInfo.locations[page]);
+	return (std::make_pair<std::string, std::string>(allowed_requests[pos], page));
 }
 
 std::string content_typer(std::vector<std::string> &content_type, int index)

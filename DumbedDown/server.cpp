@@ -95,7 +95,14 @@ void server::get_data_from_client(int i)
 				}
 			}
 		}
-		resp = response(find_page(*this, data),this->serveInfo.error_pages,data);
+		std::pair<std::string, std::string> page = find_page(*this, data);
+		if (page.second.find("cgi-bin") != std::string::npos)
+		{
+			CGI cgi(serveInfo, page);
+		}
+		else
+			resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
+		// std::cout << resp. << "\n";
 		//poll_set[i].revents = 0 | POLLOUT | POLLHUP | POLLERR;
 	}
 }
@@ -110,6 +117,7 @@ void server::get_data_from_server(int i)
 
 	std::cout << "closed" << std::endl;
 }
+
 void server::run()
 {
 	poll(poll_set.data(),poll_set.size(), 50);

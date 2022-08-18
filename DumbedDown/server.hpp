@@ -16,11 +16,14 @@
 #include<stdlib.h>
 #include<string.h>
 #include <vector>
+
 #include"Exceptions.hpp"
 #include"config_structs.hpp"
 #include"parser.hpp"
 #include"response.hpp"
 #include"utils.hpp"
+#include "CGI.hpp"
+
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 8888
 #define EPOLL_SIZE 5000
@@ -57,6 +60,6 @@ class   server {
 };
 
 	 std::string trim(const std::string& str);
-	 location_info find_page(server &serv, std::string &path);
+	 std::pair<std::string, std::string> find_page(server &serv, std::string &path);
 	 std::string content_typer(std::vector<std::string> &content_type,int index);
 #endif

@@ -94,4 +94,5 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 		this->status_code = 200;
 
 	}
+	std::cout << "status_code = " << status_code << "\n";
 }
