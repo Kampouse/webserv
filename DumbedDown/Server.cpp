@@ -2,6 +2,22 @@
 #include <sstream>
 #include <filesystem>
 
+#include <dirent.h>
+#include <stdio.h>
+
+int file_list(void) {
+	DIR *d;
+	struct dirent *dir;
+	d = opendir(".");
+	if (d) {
+		while ((dir = readdir(d)) != NULL) {
+			printf("%s\n", dir->d_name);
+		}
+		closedir(d);
+	}
+	return 0;
+}
+
 server::server(server_info servInfo)
 {
 
@@ -71,6 +87,7 @@ void server::get_data_from_client(int i)
 	else
 	{
 		data = buf;
+		std::cout << buf << "\n";
 		std::cout << data ;
 		std::string path = data.substr(data.find("/"), data.find("HTTP") - 4);
 		for (unsigned int i = 0; i < contents.size(); i++)
@@ -81,6 +98,8 @@ void server::get_data_from_client(int i)
 				std::string pathed = trim(this->serveInfo.locations["/"].root +  path);
 				std::ifstream file;
 
+				// std::string path = "./html5up-dimension" + pathed;
+				// file_list();
 				file.open(pathed.c_str());
 				if (!file.is_open())
 				{
@@ -107,14 +126,15 @@ void server::get_data_from_client(int i)
 		if (page.second.find("cgi-bin") != std::string::npos)
 		{
 			CGI cgi(serveInfo, page);
+			std::cout << cgi.get_buffer() << "\n";
 		}
 		else
 		{
 			resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
-		}
-		// std::cout << resp. << "\n";
 		//poll_set[i].revents = 0 | POLLOUT | POLLHUP | POLLERR;
 	}
+}
+
 }
 
 void server::get_data_from_server(int i)

@@ -8,7 +8,7 @@ CGI::CGI(server_info info, std::pair<std::string, std::string> page)
 	serverInfo = info;
 	request = page.first;
 	size_t pos = page.second.find("?");
-	path = page.second.substr(0, pos);
+	path = "./html5up-dimension" + page.second.substr(0, pos);
 	query = page.second.substr(pos + 1, std::string::npos);
 	scriptName = path.substr(path.find_last_of('/') + 1, std::string::npos);
 	setEnvVars();
@@ -86,13 +86,45 @@ void CGI::setEnvVars()
 
 void CGI::execCGI()
 {
-	execve(args[0], args, envp);
+	int fd[2];
+	int in;
+	pid_t pid;
+	int status;
 
-	delete[] args[0];
-	delete[] args[1];
-	delete[] args;
+	// std::cout << path << "\n";
+	pipe(fd);
+	in = dup(STDIN_FILENO);
 
-	for (size_t i = 0; i < 14; i++)
-		delete[] envp[i];
-	delete[] envp;
+	pid = fork();
+	if (pid == 0)
+	{
+		dup2(in, STDIN_FILENO);
+		dup2(fd[1], STDOUT_FILENO);
+		close(in);
+		close(fd[0]);
+		close(fd[1]);
+		execve(args[0], args, envp);
+	}
+	else
+	{
+		waitpid(pid, &status, 0);
+
+		dup2(fd[0], in);
+
+		bzero(buffer, 100000);
+		read(fd[0], buffer, 100000);
+
+		close(fd[0]);
+		close(fd[1]);
+
+		delete[] args[0];
+		delete[] args[1];
+		delete[] args;
+
+		for (size_t i = 0; i < 14; i++)
+			delete[] envp[i];
+		delete[] envp;
+	}
+	close(in);
+
 }

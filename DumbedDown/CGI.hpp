@@ -17,6 +17,7 @@ class CGI {
 		std::string path;
 		std::string query;
 		std::string scriptName;
+		char buffer[100000];
 
 		std::string getExecPath();
 
@@ -29,4 +30,5 @@ class CGI {
 		void setEnvVars();
 
 		void execCGI();
+		std::string get_buffer() { return buffer; }
 };
