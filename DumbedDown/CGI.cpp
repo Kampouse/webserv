@@ -8,7 +8,7 @@ CGI::CGI(server_info info, std::pair<std::string, std::string> page)
 	serverInfo = info;
 	request = page.first;
 	size_t pos = page.second.find("?");
-	path = "./html5up-dimension" + page.second.substr(0, pos);
+	path = info.locations["/"].root + page.second.substr(0, pos);
 	query = page.second.substr(pos + 1, std::string::npos);
 	scriptName = path.substr(path.find_last_of('/') + 1, std::string::npos);
 	setEnvVars();
