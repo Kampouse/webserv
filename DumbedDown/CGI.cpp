@@ -93,7 +93,16 @@ void CGI::execCGI()
 	int status;
 
 	// std::cout << path << "\n";
+int fd_f= 0;
+
+   if( (fd_f = open(args[0], O_RDONLY)) < 0)
+   {
+	   return;
+   }
+   else
+	   close(fd_f);
 	pipe(fd);
+
 	in = dup(STDIN_FILENO);
 
 	pid = fork();
