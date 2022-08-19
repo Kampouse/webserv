@@ -102,6 +102,13 @@ void CGI::execCGI()
 	else
 	{
 		waitpid(pid, &status, 0);
+
+		bzero(buffer, 100000);
+		read(fd[0], buffer, 100000);
+
+		close(fd[0]);
+		close(fd[1]);
+
 		delete[] args[0];
 		delete[] args[1];
 		delete[] args;
