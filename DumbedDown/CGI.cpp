@@ -60,7 +60,7 @@ void CGI::setEnvVars()
 	vars.push_back("SERVER_NAME=" + serverInfo.server_names);
 	vars.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	vars.push_back("SERVER_PROTOCOL=HTTP/1.1");
-	vars.push_back("SERVER_PORT=" + IntToString(serverInfo.port));
+	vars.push_back("SERVER_PORT=" + IntToString( serverInfo.port));
 	vars.push_back("REQUEST_METHOD=" + request);
 	vars.push_back("PATH_INFO=./" + path);
 	vars.push_back("PATH_TRANSLATED=./" + path);
@@ -73,11 +73,9 @@ void CGI::setEnvVars()
 	envp = new char*[14];
 	envp[13] = NULL;
 
-	std::vector<std::string>::iterator it = vars.begin();
 	size_t i = 0;
 	size_t len;
-
-	for (; it != vars.end(); it++, i++) {
+	for ( std::vector<std::string>::iterator it = vars.begin(); it != vars.end(); it++, i++) {
 		len = it->length() + 1;
 		envp[i] = new char[len];
 		strcpy(envp[i], it->c_str());

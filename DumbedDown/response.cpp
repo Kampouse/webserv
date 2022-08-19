@@ -31,7 +31,6 @@ std::string  response::build_response(void)
 	else if(status_code == 200 && type == "")
 	{
 		content = local_info.find_content();
-
 		content_length = content.length();
 		content_type = local_info.find_type();
 	}
@@ -74,6 +73,33 @@ response::response(std::string &path,std::string &type):path(path),type(type)
 	else
 	{
 		status_code = 200;
+		status = "200 OK";
+	}
+}
+void response ::set_response(int status_code)
+{
+	std::stringstream  ss;
+	std::string status;
+	ss << status;
+	status = ss.str();
+	if(status_code > 300  && status_code < 400)
+	{
+		this->status_code = status_code;
+		this->status = "200 OK";
+	}
+	else if(status_code > 400 && status_code < 500)
+	{
+		this->status_code = status_code;
+		status = "400 Bad Request";
+	}
+	else if(status_code > 500 && status_code < 600)
+	{
+		this->status_code = status_code;
+		status = "500 Internal Server Error";
+	}
+	else
+	{
+		this->status_code = status_code;
 		status = "200 OK";
 	}
 }

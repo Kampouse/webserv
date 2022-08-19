@@ -6,8 +6,7 @@
 #include <iostream>
 #include <map>
 
-#include "server.hpp"
-#include "utils.hpp"
+#include "Server.hpp"
 
 class CGI {
 	private:

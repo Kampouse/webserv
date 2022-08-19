@@ -1,4 +1,4 @@
-#include "server.hpp"	
+#include "Server.hpp"	
 #include <sstream>
 #include <filesystem>
 
@@ -71,6 +71,7 @@ void server::get_data_from_client(int i)
 	else
 	{
 		data = buf;
+		std::cout << data ;
 		std::string path = data.substr(data.find("/"), data.find("HTTP") - 4);
 		for (unsigned int i = 0; i < contents.size(); i++)
 		{
@@ -83,7 +84,7 @@ void server::get_data_from_client(int i)
 				file.open(pathed.c_str());
 				if (!file.is_open())
 				{
-					//  what to send to request when the content is not found
+
 					std::cout << "file not found" << std::endl;
 				}
 				else

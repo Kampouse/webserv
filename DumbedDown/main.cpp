@@ -18,7 +18,7 @@
 #include "config_structs.hpp"
 #include "parser.hpp"
 #include "utils.hpp"
-#include "server.hpp"
+#include "Server.hpp"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 8888

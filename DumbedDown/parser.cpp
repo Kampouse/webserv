@@ -15,6 +15,19 @@ parser::parser() {}
 
 parser::~parser() {}
 
+
+
+static  int convert_to_number(std::string str) {
+	std::stringstream ss(str);
+	int num;
+	ss >> num;
+  if (ss.fail()) {
+	throw std::runtime_error("Could not convert string to number");
+  }
+	return num;
+}
+
+
 parser::parser(std::string _path) {
 	parsefile(_path);
 }
@@ -148,7 +161,18 @@ void parser::manage_locations(std::vector<std::string>::iterator it)
 			}
 		}
 		else if (field == "return") {
-			;
+
+		unsigned int	field = data.find_first_of(WHITESPACES);
+			if (field > data.length())
+				throw Exceptions::InvalidFieldError("return");
+			std::string nbrs = trim(data.substr(0, field));
+			int const nbr = convert_to_number(nbrs);
+			servers.back().locations[location].redirect_code = nbr;
+			if (nbr < 300 || nbr > 399)
+				throw Exceptions::InvalidFieldError("return");
+			std::string type = trim(data.substr(field, data.length()));
+			std::cout << nbrs << type << std::endl;
+			servers.back().locations[location].redirect_to = type;
 		}
 		else
 			throw Exceptions::UnknownFieldError();
