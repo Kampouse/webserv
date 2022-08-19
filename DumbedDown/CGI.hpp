@@ -30,4 +30,5 @@ class CGI {
 		void setEnvVars();
 
 		void execCGI();
+		std::string get_buffer() { return buffer; }
 };

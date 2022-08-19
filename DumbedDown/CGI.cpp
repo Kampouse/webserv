@@ -8,7 +8,7 @@ CGI::CGI(server_info info, std::pair<std::string, std::string> page)
 	serverInfo = info;
 	request = page.first;
 	size_t pos = page.second.find("?");
-	path = page.second.substr(0, pos);
+	path = "./html5up-dimension" + page.second.substr(0, pos);
 	query = page.second.substr(pos + 1, std::string::npos);
 	scriptName = path.substr(path.find_last_of('/') + 1, std::string::npos);
 	setEnvVars();
@@ -87,21 +87,29 @@ void CGI::setEnvVars()
 void CGI::execCGI()
 {
 	int fd[2];
+	int in;
 	pid_t pid;
 	int status;
 
+	// std::cout << path << "\n";
 	pipe(fd);
-	dup2(fd[0], STDIN_FILENO);
-	dup2(fd[1], STDOUT_FILENO);
+	in = dup(STDIN_FILENO);
 
 	pid = fork();
 	if (pid == 0)
 	{
+		dup2(in, STDIN_FILENO);
+		dup2(fd[1], STDOUT_FILENO);
+		close(in);
+		close(fd[0]);
+		close(fd[1]);
 		execve(args[0], args, envp);
 	}
 	else
 	{
 		waitpid(pid, &status, 0);
+
+		dup2(fd[0], in);
 
 		bzero(buffer, 100000);
 		read(fd[0], buffer, 100000);
@@ -117,5 +125,6 @@ void CGI::execCGI()
 			delete[] envp[i];
 		delete[] envp;
 	}
+	close(in);
 
 }
