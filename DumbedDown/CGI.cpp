@@ -88,13 +88,29 @@ void CGI::setEnvVars()
 
 void CGI::execCGI()
 {
-	execve(args[0], args, envp);
+	int fd[2];
+	pid_t pid;
+	int status;
 
-	delete[] args[0];
-	delete[] args[1];
-	delete[] args;
+	pipe(fd);
+	dup2(fd[0], STDIN_FILENO);
+	dup2(fd[1], STDOUT_FILENO);
 
-	for (size_t i = 0; i < 14; i++)
-		delete[] envp[i];
-	delete[] envp;
+	pid = fork();
+	if (pid == 0)
+	{
+		execve(args[0], args, envp);
+	}
+	else
+	{
+		waitpid(pid, &status, 0);
+		delete[] args[0];
+		delete[] args[1];
+		delete[] args;
+
+		for (size_t i = 0; i < 14; i++)
+			delete[] envp[i];
+		delete[] envp;
+	}
+
 }
