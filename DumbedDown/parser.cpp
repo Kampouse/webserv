@@ -171,7 +171,6 @@ void parser::manage_locations(std::vector<std::string>::iterator it)
 			if (nbr < 300 || nbr > 399)
 				throw Exceptions::InvalidFieldError("return");
 			std::string type = trim(data.substr(field, data.length()));
-			std::cout << nbrs << type << std::endl;
 			servers.back().locations[location].redirect_to = type;
 		}
 		else

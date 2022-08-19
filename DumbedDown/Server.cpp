@@ -125,8 +125,16 @@ void server::get_data_from_client(int i)
 		std::pair<std::string, std::string> page = find_page(*this, data);
 		if (page.second.find("cgi-bin") != std::string::npos)
 		{
+
 			CGI cgi(serveInfo, page);
-			std::cout << cgi.get_buffer() << "\n";
+			if(strlen(cgi.get_buffer().c_str()) != 0)
+					resp  = response(cgi.get_buffer());
+			else
+			{
+				/// correct error page here!!
+				resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
+			}
+			
 		}
 		else
 		{

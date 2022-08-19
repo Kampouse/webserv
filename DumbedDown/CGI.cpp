@@ -8,6 +8,7 @@ CGI::CGI(server_info info, std::pair<std::string, std::string> page)
 	serverInfo = info;
 	request = page.first;
 	size_t pos = page.second.find("?");
+	//remove this hardcode 
 	path = "./html5up-dimension" + page.second.substr(0, pos);
 	query = page.second.substr(pos + 1, std::string::npos);
 	scriptName = path.substr(path.find_last_of('/') + 1, std::string::npos);
@@ -104,18 +105,19 @@ void CGI::execCGI()
 		close(fd[0]);
 		close(fd[1]);
 		execve(args[0], args, envp);
+		exit(1);
+	 std::cout << "execve failed\n";
 	}
 	else
 	{
 		waitpid(pid, &status, 0);
-
 		dup2(fd[0], in);
 
 		bzero(buffer, 100000);
-		read(fd[0], buffer, 100000);
 
 		close(fd[0]);
 		close(fd[1]);
+		std::cout << strlen(buffer);
 
 		delete[] args[0];
 		delete[] args[1];

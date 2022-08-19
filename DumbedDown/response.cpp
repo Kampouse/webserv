@@ -40,12 +40,17 @@ std::string  response::build_response(void)
 		content_length = content.length();
 		content_type = type;
 	}
+	else if (content  != "")
+	{
+		content = this->content;
+		content_length = content.length();
+		content_type = "text/html";
+	}
 	else
 	{
-		content = "";
-		content_length = 0;
+		content = local_info.find_error_page( error_page[status_code]);
+		content_length = content.length();
 		content_type = "text/html";
-
 	}
 	ss << content_length;
 	std::string content_length_str = ss.str();
@@ -65,6 +70,7 @@ std::string  response::build_response(void)
 }
 
 response::response():path(""){}
+response::response(std::string reponse_string):content(reponse_string){}
 
 response::response(std::string &path,std::string &type):path(path),type(type)
 {

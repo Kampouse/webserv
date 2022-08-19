@@ -2,6 +2,7 @@
 
 #include <unistd.h>
 #include <vector>
+#include "wait.h" 
 #include <cstring>
 #include <iostream>
 #include <map>
@@ -18,7 +19,6 @@ class CGI {
 		std::string query;
 		std::string scriptName;
 		char buffer[100000];
-
 		std::string getExecPath();
 
 	public:
