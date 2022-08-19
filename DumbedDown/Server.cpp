@@ -127,6 +127,7 @@ void server::get_data_from_client(int i)
 		{
 
 			CGI cgi(serveInfo, page);
+			std::cout << "buffer->>>>>>>>>>>>>>"  <<  cgi.get_buffer();
 			if(strlen(cgi.get_buffer().c_str()) != 0)
 					resp  = response(cgi.get_buffer());
 			else

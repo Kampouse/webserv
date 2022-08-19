@@ -114,10 +114,9 @@ void CGI::execCGI()
 		dup2(fd[0], in);
 
 		bzero(buffer, 100000);
-
+		read(fd[0], buffer,100000);
 		close(fd[0]);
 		close(fd[1]);
-		std::cout << strlen(buffer);
 
 		delete[] args[0];
 		delete[] args[1];
@@ -128,5 +127,5 @@ void CGI::execCGI()
 		delete[] envp;
 	}
 	close(in);
-
+	std::cout << buffer ;
 }

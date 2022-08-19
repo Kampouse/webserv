@@ -21,7 +21,14 @@ std::string  response::build_response(void)
 	std::stringstream ss;
 	std::string content_type ;
 	std::cout << status_code << "\n";
-	if(status_code != 200)
+	 if (status_code == 200 && this->content  != "")
+	{
+		std::cout << "hello " << this->content << std::endl;
+		content = this->content;
+		content_length = strlen(this->content.c_str());
+		content_type = "text/html";
+	}
+	else if(status_code != 200)
 	{
 		content  = 	local_info.find_error_page( error_page[status_code]);
 		std::cout << "error " << content << std::endl;
@@ -40,12 +47,7 @@ std::string  response::build_response(void)
 		content_length = content.length();
 		content_type = type;
 	}
-	else if (content  != "")
-	{
-		content = this->content;
-		content_length = content.length();
-		content_type = "text/html";
-	}
+	
 	else
 	{
 		content = local_info.find_error_page( error_page[status_code]);
@@ -70,7 +72,7 @@ std::string  response::build_response(void)
 }
 
 response::response():path(""){}
-response::response(std::string reponse_string):content(reponse_string){}
+response::response(std::string reponse_string):content(reponse_string),status_code(200){}
 
 response::response(std::string &path,std::string &type):path(path),type(type)
 {
