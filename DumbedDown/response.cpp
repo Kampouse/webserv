@@ -45,6 +45,7 @@ std::string  response::build_response(void)
 		content = "";
 		content_length = 0;
 		content_type = "text/html";
+
 	}
 	ss << content_length;
 	std::string content_length_str = ss.str();
@@ -53,6 +54,8 @@ std::string  response::build_response(void)
     strftime(time_string,80,"%a, %b %d %H:%M:%S %Y",timeinfo);
 	std::string response = "HTTP/1.1 " + status + "\r\n";
 	response += "Date: " + std::string(time_string) + "\r\n";
+	if (local_info.redirect_to != "")
+		response += "Location: " + local_info.redirect_to + "\r\n";
 	response += "Content-Type: " + content_type + "\r\n";
 	response += "Content-Length: " + content_length_str  + "\r\n";
 	response += "\r\n";
@@ -109,10 +112,17 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 	this->type = "";
 	this->local_info = local_info;
 	this->path = path;
-	if (local_info.root == "")
+
+	if(local_info.redirect_to != "")
+	{
+		this->status = "301 Moved Permanently"; 
+		this->status_code = 301;
+	}
+	else if (local_info.root == "")
 	{
 		this->status = "404 Not Found";
 		this->status_code = 404;
+
 	}
 	else
 	{
@@ -120,5 +130,4 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 		this->status_code = 200;
 
 	}
-	std::cout << "status_code = " << status_code << "\n";
 }

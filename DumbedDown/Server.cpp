@@ -86,6 +86,7 @@ void server::get_data_from_client(int i)
 				{
 
 					std::cout << "file not found" << std::endl;
+
 				}
 				else
 				{
@@ -96,13 +97,21 @@ void server::get_data_from_client(int i)
 				}
 			}
 		}
+
+
+
+
+
+
 		std::pair<std::string, std::string> page = find_page(*this, data);
 		if (page.second.find("cgi-bin") != std::string::npos)
 		{
 			CGI cgi(serveInfo, page);
 		}
 		else
+		{
 			resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
+		}
 		// std::cout << resp. << "\n";
 		//poll_set[i].revents = 0 | POLLOUT | POLLHUP | POLLERR;
 	}
