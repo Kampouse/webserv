@@ -1,7 +1,5 @@
 #include "response.hpp"
 #include <sstream>
-
-
 std::string readfile(std::string path)
 {
 	std::ifstream file(path.c_str());

@@ -3,7 +3,12 @@
 
 #include <iostream>
 #include <string>
+#include <cstring>
 #include "config_structs.hpp"
+#if OS == LINUX
+#include "wait.h"
+#endif
+
 
 class response {
 	public:
