@@ -104,6 +104,7 @@ void CGI::execCGI()
 		close(fd[0]);
 		close(fd[1]);
 		execve(args[0], args, envp);
+		exit (1);
 	}
 	else
 	{
