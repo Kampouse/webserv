@@ -3,6 +3,14 @@
 print "<html>";
 print "<head>";
 print "<title>PERL POST</title>";
+print "<style>";
+print "body {";
+print "  background-color: #0c2c61;";
+print "}";
+print "h2 {";
+print "  color: #ffffff;";
+print "}";
+print "</style>";
 print "</head>";
 print "<body>";
 print "<h2>SERVER_SOFTWARE = $ENV{'SERVER_SOFTWARE'}</h2>";
