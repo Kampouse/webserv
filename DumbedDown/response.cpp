@@ -1,7 +1,5 @@
 #include "response.hpp"
 #include <sstream>
-
-
 std::string readfile(std::string path)
 {
 	std::ifstream file(path.c_str());
@@ -21,7 +19,14 @@ std::string  response::build_response(void)
 	std::stringstream ss;
 	std::string content_type ;
 	std::cout << status_code << "\n";
-	if(status_code != 200)
+	 if (status_code == 200 && this->content  != "")
+	{
+		std::cout << "hello " << this->content << std::endl;
+		content = this->content;
+		content_length = strlen(this->content.c_str());
+		content_type = "text/html";
+	}
+	else if(status_code != 200)
 	{
 		content  = 	local_info.find_error_page( error_page[status_code]);
 		std::cout << "error " << content << std::endl;
@@ -40,10 +45,11 @@ std::string  response::build_response(void)
 		content_length = content.length();
 		content_type = type;
 	}
+	
 	else
 	{
-		content = "";
-		content_length = 0;
+		content = local_info.find_error_page( error_page[status_code]);
+		content_length = content.length();
 		content_type = "text/html";
 	}
 	ss << content_length;
@@ -53,6 +59,8 @@ std::string  response::build_response(void)
     strftime(time_string,80,"%a, %b %d %H:%M:%S %Y",timeinfo);
 	std::string response = "HTTP/1.1 " + status + "\r\n";
 	response += "Date: " + std::string(time_string) + "\r\n";
+	if (local_info.redirect_to != "")
+		response += "Location: " + local_info.redirect_to + "\r\n";
 	response += "Content-Type: " + content_type + "\r\n";
 	response += "Content-Length: " + content_length_str  + "\r\n";
 	response += "\r\n";
@@ -62,6 +70,7 @@ std::string  response::build_response(void)
 }
 
 response::response():path(""){}
+response::response(std::string reponse_string):content(reponse_string),status_code(200){}
 
 response::response(std::string &path,std::string &type):path(path),type(type)
 {
@@ -109,10 +118,17 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 	this->type = "";
 	this->local_info = local_info;
 	this->path = path;
-	if (local_info.root == "")
+
+	if(local_info.redirect_to != "")
+	{
+		this->status = "301 Moved Permanently"; 
+		this->status_code = 301;
+	}
+	else if (local_info.root == "")
 	{
 		this->status = "404 Not Found";
 		this->status_code = 404;
+
 	}
 	else
 	{
@@ -120,5 +136,4 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 		this->status_code = 200;
 
 	}
-	std::cout << "status_code = " << status_code << "\n";
 }

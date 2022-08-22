@@ -92,7 +92,16 @@ void CGI::execCGI()
 	int status;
 
 	// std::cout << path << "\n";
+int fd_f= 0;
+
+   if( (fd_f = open(args[0], O_RDONLY)) < 0)
+   {
+	   return;
+   }
+   else
+	   close(fd_f);
 	pipe(fd);
+
 	in = dup(STDIN_FILENO);
 
 	pid = fork();
@@ -104,17 +113,16 @@ void CGI::execCGI()
 		close(fd[0]);
 		close(fd[1]);
 		execve(args[0], args, envp);
-		exit (1);
+		exit(1);
+		std::cout << "execve failed\n";
 	}
 	else
 	{
 		waitpid(pid, &status, 0);
-
 		dup2(fd[0], in);
 
 		bzero(buffer, 100000);
-		read(fd[0], buffer, 100000);
-
+		read(fd[0], buffer,100000);
 		close(fd[0]);
 		close(fd[1]);
 
@@ -127,5 +135,5 @@ void CGI::execCGI()
 		delete[] envp;
 	}
 	close(in);
-
+	std::cout << buffer ;
 }

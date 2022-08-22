@@ -18,7 +18,6 @@ class CGI {
 		std::string query;
 		std::string scriptName;
 		char buffer[100000];
-
 		std::string getExecPath();
 
 	public:
