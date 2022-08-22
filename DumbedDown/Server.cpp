@@ -148,7 +148,9 @@ void server::get_data_from_client(int i)
 
 void server::get_data_from_server(int i)
 {
-	std::string http_response =  resp.build_response();
+	std::string http_response =  
+	
+	resp.build_response(serveInfo.locations);
 	int ret = send(poll_set[i].fd, http_response.c_str(), http_response.length(), 0);
 
 	if (ret < 0) { return; }

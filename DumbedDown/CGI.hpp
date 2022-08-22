@@ -5,7 +5,7 @@
 #include <cstring>
 #include <iostream>
 #include <map>
-
+#include "wait.h" 
 #include "Server.hpp"
 
 class CGI {

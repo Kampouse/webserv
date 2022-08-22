@@ -1,5 +1,6 @@
 #include "response.hpp"
 #include <sstream>
+#include "dirent.h"
 std::string readfile(std::string path)
 {
 	std::ifstream file(path.c_str());
@@ -9,7 +10,7 @@ std::string readfile(std::string path)
 	return buffer.str();
 }
 
-std::string  response::build_response(void)
+std::string  response::build_response(std::map<std::string,location_info> &lst_info )
 {
 	std::string content;
 	time_t rawtime;
@@ -38,16 +39,46 @@ std::string  response::build_response(void)
 		content = local_info.find_content();
 		content_length = content.length();
 		content_type = local_info.find_type();
-	}
+		std::string type = content_type.substr(content_type.find("/") + 1);
+		if(type == "" && local_info.autoindex == true)
+		{
+			content_type = "text/html";
+		content = "<!DOCTYPE html><html><head><title>Index of " + local_info.root + 
+		"</title></head><body><h1>Index of " + local_info.root + 
+		"</h1><table><tr><th>Name</th><th>Last modified</th><th>Size</th></tr>";
+		opendir(local_info.root.c_str());
+			DIR *dir;
+			struct dirent *ent;
+			dir = opendir(local_info.root.c_str());
+			if (dir != NULL)
+			{
+				while ((ent = readdir(dir)) != NULL)
+				{
+					std::string loc("/");
+					 loc+= ent->d_name;
+					lst_info[loc] = location_info(loc);
+		std::cout << "->>>>>>>>>"  << loc;
+					content += "<tr><td><a href=\"";
+					content	+= ent->d_name ;
+					content += "\">" ;
+					content += ent->d_name ;
+					content += "</a></td>";
+					content += "<br>";
+				}
+				closedir(dir);
+			}
+		}
+		content_length = content.length();
+		}
 	else if (status_code == 200 && type != "")
 	{
 		content = readfile(path);
 		content_length = content.length();
 		content_type = type;
 	}
-	
 	else
 	{
+
 		content = local_info.find_error_page( error_page[status_code]);
 		content_length = content.length();
 		content_type = "text/html";
@@ -64,7 +95,6 @@ std::string  response::build_response(void)
 	response += "Content-Type: " + content_type + "\r\n";
 	response += "Content-Length: " + content_length_str  + "\r\n";
 	response += "\r\n";
-	std::cout << response << std::endl;
 	response += content;
 	return response;
 }

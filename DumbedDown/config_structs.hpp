@@ -69,6 +69,7 @@ struct location_info {
 	std::string find_type() const
 	{
 		std::string type = "text/" + this->index.substr(index.find(".") + 1);
+
 		return type;
 	}
 
