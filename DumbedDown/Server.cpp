@@ -76,7 +76,7 @@ void server::get_data_from_client(int i)
 		data = buf;
 		std::cout << buf << "\n";
 		std::cout << data ;
-		std::string path = data.substr(data.find("/"), data.find("HTTP") - 4);
+		std::string path = data.substr(data.find("/"), data.find("HTTP") - data.find("/") - 1);
 		for (unsigned int i = 0; i < contents.size(); i++)
 		{
 			if (path.find(contents[i]) != std::string::npos)
@@ -85,8 +85,6 @@ void server::get_data_from_client(int i)
 				std::string pathed = trim(this->serveInfo.locations["/"].root +  path);
 				std::ifstream file;
 
-				// std::string path = "./html5up-dimension" + pathed;
-				// file_list();
 				file.open(pathed.c_str());
 				if (!file.is_open())
 				{

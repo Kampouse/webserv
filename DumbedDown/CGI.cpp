@@ -62,8 +62,8 @@ void CGI::setEnvVars()
 	vars.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	vars.push_back("SERVER_PORT=" + IntToString( serverInfo.port));
 	vars.push_back("REQUEST_METHOD=" + request);
-	vars.push_back("PATH_INFO=./" + path);
-	vars.push_back("PATH_TRANSLATED=./" + path);
+	vars.push_back("PATH_INFO=" + path);
+	vars.push_back("PATH_TRANSLATED=" + path);
 	vars.push_back("SCRIPT_NAME=" + scriptName);
 	vars.push_back("QUERY_STRING=" + query);
 	vars.push_back("REMOTE_ADDR=" + serverInfo.host);
@@ -92,7 +92,7 @@ void CGI::execCGI()
 	int status;
 
 	// std::cout << path << "\n";
-int fd_f= 0;
+	int fd_f= 0;
 
    if( (fd_f = open(args[0], O_RDONLY)) < 0)
    {
