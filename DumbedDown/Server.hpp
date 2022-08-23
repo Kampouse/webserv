@@ -1,29 +1,33 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
+
 #include <iostream>
 #include <string>
 #include <list>
 #include <sys/fcntl.h>
-#include<sys/types.h>
-#include<sys/socket.h>
-#include<netinet/in.h>
-#include<arpa/inet.h>
-#include<fcntl.h>
-#include<errno.h>
-#include<unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
 #include "poll.h" 
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <vector>
 #include <utility>
+#include <sstream>
+#include <filesystem>
 
-#include"Exceptions.hpp"
-#include"config_structs.hpp"
-#include"parser.hpp"
-#include"response.hpp"
-#include"utils.hpp"
+#include "Exceptions.hpp"
+#include "config_structs.hpp"
+#include "parser.hpp"
+#include "response.hpp"
+#include "utils.hpp"
 #include "CGI.hpp"
+#include "upload.hpp"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 8888

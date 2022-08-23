@@ -404,9 +404,28 @@ const fn = (res)=>{}
 
 const deleteBtn = document.getElementById("deleteBtn");
 if (deleteBtn) {
-	deleteBtn.addEventListener("click", function (event) {
+	deleteBtn.addEventListener("click", (event)=>{
 		event.preventDefault();
-		alert("Deleted successfully!");
+		alert("Upload Directory Deleted");
 		axios.delete("http://127.0.0.1:8081/upload").then(fn);
 	})
+	 
+}
+
+function validate(el) {
+	let maxfilesize = 1024 * 1024;  // 1 Mb
+	let	filesize    = el.files[0].size;
+		//warningel   = document.getElementById( 'lbError' );
+
+	if ( filesize > maxfilesize)
+	{
+		alert("File is trop beaucoup!");
+		//document.getElementById("submit").disabled = true;
+		return false;
+	}
+	else
+	{
+		document.getElementById("submit").disabled = false;
+		return true;
+	}   
 }

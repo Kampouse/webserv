@@ -1,9 +1,4 @@
-#include "Server.hpp"	
-#include <sstream>
-#include <filesystem>
-
-#include <dirent.h>
-#include <stdio.h>
+#include "Server.hpp"
 
 server::server(server_info servInfo)
 {
@@ -103,18 +98,19 @@ void server::get_data_from_client(int i)
 		}
 
 
-
-
-
-
 		std::pair<std::string, std::string> page = find_page(*this, data);
-		if (page.second.find("cgi-bin") != std::string::npos)
+		if (page.first == "POST" && page.second == "/upload")
+		{
+			std::cout << "HANDLE UPLOAD\n";
+			upload(serveInfo, page);
+		}
+		else if (page.second.find("cgi-bin") != std::string::npos)
 		{
 
 			CGI cgi(serveInfo, page);
 			std::cout << "buffer->>>>>>>>>>>>>>"  <<  cgi.get_buffer();
-			if(strlen(cgi.get_buffer().c_str()) != 0)
-					resp  = response(cgi.get_buffer());
+			if (strlen(cgi.get_buffer().c_str()) != 0)
+				resp  = response(cgi.get_buffer());
 			else
 			{
 				/// correct error page here!!
