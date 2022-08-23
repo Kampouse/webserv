@@ -5,18 +5,7 @@
 #include <dirent.h>
 #include <stdio.h>
 
-int file_list(void) {
-	DIR *d;
-	struct dirent *dir;
-	d = opendir(".");
-	if (d) {
-		while ((dir = readdir(d)) != NULL) {
-			printf("%s\n", dir->d_name);
-		}
-		closedir(d);
-	}
-	return 0;
-}
+
 
 server::server(server_info servInfo)
 {
@@ -151,6 +140,7 @@ void server::get_data_from_server(int i)
 	std::string http_response =  
 	
 	resp.build_response(serveInfo.locations);
+
 	int ret = send(poll_set[i].fd, http_response.c_str(), http_response.length(), 0);
 
 	if (ret < 0) { return; }

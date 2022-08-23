@@ -36,6 +36,15 @@ struct location_info {
 		redirect_code = 0;
 	}
 
+  
+
+
+
+
+
+
+
+
 	std::string find_error_page(std::string path) const
 	{
 		std::string data;

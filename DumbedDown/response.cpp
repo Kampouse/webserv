@@ -1,6 +1,32 @@
 #include "response.hpp"
+#include <pthread.h>
 #include <sstream>
 #include "dirent.h"
+
+void listFilesRecursively( const char *basePath)
+{
+    char path[1000];
+    struct dirent *dp;
+    DIR *dir = opendir(basePath);
+
+    // Unable to open directory stream
+    if (!dir)
+	{
+        return ;
+	}
+    while ((dp = readdir(dir)) != NULL)
+    {
+        if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0)
+        {
+            strcpy(path, basePath);
+            strcat(path, "/");
+            strcat(path, dp->d_name);
+            listFilesRecursively(path);
+        }
+    }
+    closedir(dir);
+}
+
 std::string readfile(std::string path)
 {
 	std::ifstream file(path.c_str());
@@ -46,6 +72,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 		content = "<!DOCTYPE html><html><head><title>Index of " + local_info.root + 
 		"</title></head><body><h1>Index of " + local_info.root + 
 		"</h1><table><tr><th>Name</th><th>Last modified</th><th>Size</th></tr>";
+		listFilesRecursively(local_info.root.c_str());
 		opendir(local_info.root.c_str());
 			DIR *dir;
 			struct dirent *ent;
@@ -55,9 +82,9 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 				while ((ent = readdir(dir)) != NULL)
 				{
 					std::string loc("/");
-					 loc+= ent->d_name;
+					 loc += ent->d_name;
 					lst_info[loc] = location_info(loc);
-		std::cout << "->>>>>>>>>"  << loc;
+					std::cout << "->>>>>>>>>"  << loc;
 					content += "<tr><td><a href=\"";
 					content	+= ent->d_name ;
 					content += "\">" ;
