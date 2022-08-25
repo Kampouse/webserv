@@ -23,4 +23,6 @@ class upload {
 		~upload();
 
 		void get_filename();
+		bool delete_file();
+		void write_file();
 };

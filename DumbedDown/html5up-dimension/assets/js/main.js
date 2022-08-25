@@ -411,21 +411,3 @@ if (deleteBtn) {
 	})
 	 
 }
-
-function validate(el) {
-	let maxfilesize = 1024 * 1024;  // 1 Mb
-	let	filesize    = el.files[0].size;
-		//warningel   = document.getElementById( 'lbError' );
-
-	if ( filesize > maxfilesize)
-	{
-		alert("File is trop beaucoup!");
-		//document.getElementById("submit").disabled = true;
-		return false;
-	}
-	else
-	{
-		document.getElementById("submit").disabled = false;
-		return true;
-	}   
-}
