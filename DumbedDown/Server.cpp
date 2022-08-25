@@ -33,6 +33,22 @@ server::server(server_info servInfo)
 
 }
 
+void server::get_content_length(std::string buf)
+{
+	size_t len = 0;
+	size_t pos = buf.find("Content-Length: ");
+	if (pos != std::string::npos)
+	{
+		pos += 16;
+		while (std::isdigit(buf[pos])) {
+			len *= 10;
+			len += ((int)(buf[pos]) - 48);
+			pos++;
+		}
+	}
+	content_length = len;
+}
+
 void   server::clear_fd (int i)
 {
 	close(poll_set[i].fd);
@@ -62,15 +78,30 @@ void server::add_client (void)
 void server::get_data_from_client(int i)
 {
 	char buf[BUF_SIZE];
-	std::string data;
+	// std::string data;
 	int ret = recv(poll_set[i].fd, buf, BUF_SIZE, 0);
+	get_content_length(buf);
+	buffer.clear();
+	buffer.reserve(content_length + 2500);
+	buffer.insert(buffer.begin(), std::begin(buf), std::begin(buf) + strlen(buf));
+	if (ret == BUF_SIZE && content_length > BUF_SIZE)
+	{
+		std::cout << "ENTERED IF\n";
+		while (ret == BUF_SIZE) {
+			std::cout << "ENTERED RET\n";
+			bzero(buf, BUF_SIZE);
+			ret = recv(poll_set[i].fd, buf, BUF_SIZE, 0);
+			buffer.insert(buffer.end(), std::begin(buf), std::begin(buf) + strlen(buf));
+		}
+	}
 	if(ret < 0){ return; }
 	else if(ret == 0){ clear_fd(i); }
 	else
 	{
-		data = buf;
-		std::cout << buf << "\n";
-		std::cout << data ;
+		// data = buf;
+		std::string data(buffer.begin(), buffer.end());
+		// std::cout << buf << "\n" << strlen(buf) << "\n" << BUF_SIZE << "\n";
+		// std::cout << "DATA = \n" << data ;
 		std::string path = data.substr(data.find("/"), data.find("HTTP") - data.find("/") - 1);
 		for (unsigned int i = 0; i < contents.size(); i++)
 		{
@@ -101,8 +132,13 @@ void server::get_data_from_client(int i)
 		std::pair<std::string, std::string> page = find_page(*this, data);
 		if (page.first == "POST" && page.second == "/upload")
 		{
-			std::cout << "HANDLE UPLOAD\n";
-			upload(serveInfo, page);
+			// std::cout << "HANDLE UPLOAD\n";
+			// std::cout << "\nCONTENT-LENGTH = " << content_length << "\n";
+			// std::cout << "BUFFER = \n";
+			// for (std::vector<char>::iterator it = buffer.begin(); it != buffer.end(); it++)
+			// 	std::cout << *it;
+			// std::cout << "END BUFFER\n";
+			upload(serveInfo, page, data);
 		}
 		else if (page.second.find("cgi-bin") != std::string::npos)
 		{

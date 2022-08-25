@@ -45,6 +45,8 @@ class   server {
 		server_info serveInfo;
 		int server_fd;
 		response resp;
+		std::vector<char> buffer;
+		size_t content_length;
 	
 		server(){};
 		server( struct server_info serv);
@@ -61,6 +63,7 @@ class   server {
 
 	private :
 		std::vector<std::string> contents;
+		void get_content_length(std::string buf);
 
 };
 

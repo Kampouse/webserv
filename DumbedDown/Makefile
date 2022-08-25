@@ -2,7 +2,7 @@ NAME = webserv
 CC = g++
 FLAGS = -Wall -Wextra -Werror --std=c++98 -g
 
-SRCS = Exceptions.cpp main.cpp parser.cpp utils.cpp Server.cpp server_utils.cpp  response.cpp CGI.cpp
+SRCS = Exceptions.cpp main.cpp parser.cpp utils.cpp Server.cpp server_utils.cpp response.cpp CGI.cpp upload.cpp
 
 
 RM =  rm -rf
