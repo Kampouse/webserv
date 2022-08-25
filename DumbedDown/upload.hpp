@@ -6,6 +6,9 @@
 #include "config_structs.hpp"
 #include "Server.hpp"
 
+class server;
+class response;
+
 class upload {
 	private:
 		server_info serverInfo;
@@ -16,7 +19,7 @@ class upload {
 
 	public:
 		upload();
-		upload(server_info, std::pair<std::string, std::string>, std::string);
+		upload(server&, std::pair<std::string, std::string>, std::string, unsigned int);
 		~upload();
 
 		void get_filename();

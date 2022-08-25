@@ -3,9 +3,16 @@
 upload::upload() {}
 upload::~upload() {}
 
-upload::upload(server_info infos, std::pair<std::string, std::string> page, std::string buf)
-	: serverInfo(infos), rqst(page), buffer(buf), filename("")
+upload::upload(server &serv, std::pair<std::string, std::string> page, std::string buf, unsigned int content_length)
+	: serverInfo(serv.serveInfo), rqst(page), buffer(buf), filename("")
 {
+	content_length = 100000000;
+	if (content_length > serverInfo.client_max_body_size)
+	{
+		serv.resp.set_status_code(413);
+		// resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
+		return ;
+	}
 	get_filename();
 }
 

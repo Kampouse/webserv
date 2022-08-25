@@ -37,7 +37,7 @@
 
 class response;
 
-class   server {
+class server {
 
 	public:
 		std::vector<pollfd> poll_set;
@@ -46,7 +46,7 @@ class   server {
 		int server_fd;
 		response resp;
 		std::vector<char> buffer;
-		size_t content_length;
+		unsigned int content_length;
 	
 		server(){};
 		server( struct server_info serv);

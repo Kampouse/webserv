@@ -35,7 +35,7 @@ server::server(server_info servInfo)
 
 void server::get_content_length(std::string buf)
 {
-	size_t len = 0;
+	unsigned int len = 0;
 	size_t pos = buf.find("Content-Length: ");
 	if (pos != std::string::npos)
 	{
@@ -138,7 +138,7 @@ void server::get_data_from_client(int i)
 			// for (std::vector<char>::iterator it = buffer.begin(); it != buffer.end(); it++)
 			// 	std::cout << *it;
 			// std::cout << "END BUFFER\n";
-			upload(serveInfo, page, data);
+			upload(*this, page, data, content_length);
 		}
 		else if (page.second.find("cgi-bin") != std::string::npos)
 		{

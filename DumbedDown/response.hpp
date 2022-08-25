@@ -16,7 +16,8 @@ class response {
 		response(location_info serv, std::map<int,std::string> error_page,std::string &path);
 		response (std::string &path,std::string &type);
 		std::string build_response(void);
-	void	set_response(int value); 
+		void set_response(int value);
+		void set_status_code(int code);
 
 	private: 
 		location_info  local_info;

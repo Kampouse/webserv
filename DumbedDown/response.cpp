@@ -1,5 +1,8 @@
 #include "response.hpp"
 #include <sstream>
+
+void response::set_status_code(int code) { status_code = code; }
+
 std::string readfile(std::string path)
 {
 	std::ifstream file(path.c_str());
