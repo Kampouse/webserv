@@ -3,17 +3,18 @@
 #include <sstream>
 #include "dirent.h"
 
-void listFilesRecursively( const char *basePath)
+std::vector<std::string> listFilesRecursively( const char *basePath,std::vector<std::string>&lst,std::map<std::string,location_info >&locations)
 {
     char path[1000];
     struct dirent *dp;
     DIR *dir = opendir(basePath);
-
+	std::vector<std::string> files;
     // Unable to open directory stream
     if (!dir)
 	{
-        return ;
+        return files;
 	}
+	locations[basePath].autoindex = true;
     while ((dp = readdir(dir)) != NULL)
     {
         if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0)
@@ -21,11 +22,29 @@ void listFilesRecursively( const char *basePath)
             strcpy(path, basePath);
             strcat(path, "/");
             strcat(path, dp->d_name);
-            listFilesRecursively(path);
-        }
+				if (dp->d_type == DT_DIR)
+				{
+					lst.push_back(path);
+					std::string			s(path);
+					s.find("/");
+					locations[s.substr(s.find("/"))].autoindex = true;
+					locations[s.substr(s.find("/"))].root = path;
+				}
+				if (dp->d_type == DT_REG)
+				{
+					files.push_back(path);
+					std::string			s(path);
+					s.find("/");
+					locations[s.substr(s.find("/"))].autoindex = false;
+					locations[s.substr(s.find("/"))].root = path;
+				}
+       }
+	
+	}
+	closedir(dir);
+	return files;
     }
-    closedir(dir);
-}
+
 
 std::string readfile(std::string path)
 {
@@ -72,30 +91,27 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 		content = "<!DOCTYPE html><html><head><title>Index of " + local_info.root + 
 		"</title></head><body><h1>Index of " + local_info.root + 
 		"</h1><table><tr><th>Name</th><th>Last modified</th><th>Size</th></tr>";
-		listFilesRecursively(local_info.root.c_str());
-		opendir(local_info.root.c_str());
-			DIR *dir;
-			struct dirent *ent;
-			dir = opendir(local_info.root.c_str());
-			if (dir != NULL)
+		std::vector<std::string> lst;
+	 std::vector<std::string> files =	listFilesRecursively(local_info.root.c_str(),lst,lst_info);
+
+			 std::cout << "there is " << lst.size();
+			for (std::vector<std::string>::iterator it = lst.begin(); it != lst.end(); ++it)
 			{
-				while ((ent = readdir(dir)) != NULL)
-				{
-					std::string loc("/");
-					 loc += ent->d_name;
-					lst_info[loc] = location_info(loc);
-					std::cout << "->>>>>>>>>"  << loc;
-					content += "<tr><td><a href=\"";
-					content	+= ent->d_name ;
-					content += "\">" ;
-					content += ent->d_name ;
-					content += "</a></td>";
-					content += "<br>";
-				}
-				closedir(dir);
+				content += "<tr><td><a href=\"" + *it + "\">" + *it + "</a></td><td>" ;
+				std::cout << *it << std::endl;
+			}
+			if(files.size() != 0)
+			{
+
+
+						for (size_t val = 0; val != files.size(); ++val )
+						{
+							content += "<tr><td><a href=\"" +  files[val]+ "\">" + files[val] + "</a></td><td>" ;
+							std::cout << files[val]<< std::endl;
+						}
 			}
 		}
-		content_length = content.length();
+			content_length = content.length();
 		}
 	else if (status_code == 200 && type != "")
 	{
