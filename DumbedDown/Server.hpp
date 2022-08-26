@@ -47,6 +47,7 @@ class server {
 		response resp;
 		std::vector<char> buffer;
 		unsigned int content_length;
+		unsigned int total_ret;
 	
 		server(){};
 		server( struct server_info serv);

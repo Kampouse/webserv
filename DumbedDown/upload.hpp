@@ -24,5 +24,5 @@ class upload {
 
 		void get_filename();
 		bool delete_file();
-		void write_file();
+		void write_file(server &serv);
 };

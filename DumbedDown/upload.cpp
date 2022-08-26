@@ -7,8 +7,8 @@ upload::upload(server &serv, std::pair<std::string, std::string> page, std::stri
 	: serverInfo(serv.serveInfo), rqst(page), buffer(buf), filename("")
 {
 	// content_length = 100000000;
+	// std::cout << buffer << "\nHELLO\n";
 	struct stat s;
-	std::cout << buffer << "\nHELLO\n";
 	if (content_length > serverInfo.client_max_body_size)
 	{
 		serv.resp.set_status_code(413);
@@ -25,7 +25,7 @@ upload::upload(server &serv, std::pair<std::string, std::string> page, std::stri
 		}
 	}
 
-	write_file();
+	write_file(serv);
 	serv.resp = response("/upload");
 }
 
@@ -58,35 +58,54 @@ void upload::get_filename()
 			}
 		}
 
-		std::cout << "PATH = " << path << "\n";
 		if (!(stat(path.c_str(), &s) == 0 && s.st_mode & S_IFDIR))
 			mkdir(path.c_str(), S_IRWXG | S_IRWXO | S_IRWXU);
 
 		path.append(filename);
-		std::cout << "PATH = " << path << "\n";
 	}
 }
 
-void upload::write_file()
+void upload::write_file(server &serv)
 {
 	std::ofstream ofs(path.c_str(), std::ofstream::out | std::ofstream::binary | std::ofstream::app);
-	
+
 	size_t start = buffer.find("filename=\"");
 	start = buffer.find("\r\n\r\n", start);
 	start += 4;
-	std::cout << "START = " << start << "\n";
+	// std::cout << "START = " << start << "\n";
 
 	size_t pos = buffer.find("boundary") + 9;
-	std::string boundary = buffer.substr(pos, buffer.find("\r\n\r\n", pos) - pos);
+	std::string boundary = buffer.substr(pos, buffer.find("\r\n", pos) - pos);
+	boundary.insert(0, "--");
 
-	std::cout << "BOUNDARY = " << boundary << "END OF BOUNDARY\n";
+	// std::cout << "BOUNDARY = " << boundary << "END OF BOUNDARY\n";
 
-	size_t length = buffer.find(boundary, start);
-	if (length != std::string::npos)
-		length -= start;
+	const char * str = buffer.c_str();
+	char * ptr;
+	pos = start;
+	while (pos < serv.total_ret)
+	{
+		size_t len = strlen(str + pos);
+		ptr = (char *)memchr(str + pos, '-', len);
+		if (ptr == NULL)
+			pos += len + 1;
+		else
+		{
+			pos = ptr - str + 1; 
+			if (memcmp(ptr, boundary.c_str(), strlen(boundary.c_str())) == 0) {
+				break ;
+			}
+		}
+	}
+	size_t length = pos - start - 3;
 
-	std::cout << "LENGTH = " << length << "\n";
+	// for (size_t i = 0; i < length; i++)
+	// 	std::cout << buffer[start + i];
 
+	// std::cout << "START = " << start << "\n";
+	// std::cout << "LENGTH = " << length << "\n";
+	// for (size_t i = start; i < length; i++)
 	ofs.write(&buffer[start], length);
+
 	ofs.close();
 }
