@@ -3,7 +3,8 @@
 #include <sstream>
 #include "dirent.h"
 
-std::vector<std::string> listFilesRecursively( const char *basePath,std::vector<std::string>&lst,std::map<std::string,location_info >&locations)
+std::vector<std::string> listFilesRecursively( const char *basePath,std::vector<std::string>&lst,
+std::map<std::string,location_info >&locations)
 {
     char path[1000];
     struct dirent *dp;
@@ -32,17 +33,16 @@ std::vector<std::string> listFilesRecursively( const char *basePath,std::vector<
 					locations[s].autoindex = true;
 					locations[s].root = path;
 				}
-				if (dp->d_type == DT_REG)
+				else if (dp->d_type == DT_REG)
 				{
 
 					std::string s = path; 
 					 s =  s.substr( s.find("/")); 
 					 files.push_back (s);
-
+					 std::cout << "Path:"  << s << std::endl;
 					locations[s].autoindex = false;
 					locations[s].root = s;
 					locations[s].index = s;
-					std::cout << "FILE: " << s << std::endl;
 				}
        }
 	
@@ -98,8 +98,8 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 		content = "<!DOCTYPE html><html><head><title>Index of " + local_info.root + 
 		"</title></head><body><h1>Index of " + local_info.root + 
 		"</h1><table><tr><th>Name</th><th>Last modified</th><th>Size</th></tr>";
-		std::vector<std::string> lst;
-	 std::vector<std::string> files =	listFilesRecursively(local_info.root.c_str(),lst,lst_info);
+			std::vector<std::string> lst;
+			 std::vector<std::string> files =	listFilesRecursively(local_info.root.c_str(),lst,lst_info);
 
 			 std::cout << "there is " << lst.size();
 			for (std::vector<std::string>::iterator it = lst.begin(); it != lst.end(); ++it)
@@ -139,10 +139,19 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	else
 	{
 
+		std::cout << "where i reach" << std::endl;
 		content = local_info.find_error_page( error_page[status_code]);
 		content_length = content.length();
 		content_type = "text/html";
 	}
+
+     std::string str = readfile("." + local_info.root);
+
+	 if (str.length() !=0)
+	 {
+		// std::cout << "hello " << str << std::endl;
+
+	 }
 	ss << content_length;
 	std::string content_length_str = ss.str();
     time (&rawtime);
@@ -153,9 +162,23 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	if (local_info.redirect_to != "")
 		response += "Location: " + local_info.redirect_to + "\r\n";
 	response += "Content-Type: " + content_type + "\r\n";
-	response += "Content-Length: " + content_length_str  + "\r\n";
+	if (str.length() !=0)
+	 {
+		 ss << str.length();
+		 content_length_str = ss.str();
+		 response += "Content-Length: " + content_length_str + "\r\n";
+	 }
+	else
+		response += "Content-Length: " + content_length_str + "\r\n";
 	response += "\r\n";
-	response += content;
+	if(str != "")
+	{
+		response += str;
+	}
+	else
+	{
+		response += content;
+	}
 	return response;
 }
 
