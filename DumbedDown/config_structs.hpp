@@ -80,8 +80,34 @@ struct location_info {
 
 	std::string find_type() const
 	{
+		// applicaton text plain  default if cant find;
+	
+		std::vector<std::string>contents;
+		std::string val =  this->index.substr(index.find(".") + 1);
+			contents.push_back("png");
+			contents.push_back("jpg");
+			contents.push_back("jpeg");
+			contents.push_back("gif");
+			contents.push_back("ico");
+			
+			if (std::find(contents.begin(), contents.end(), val) != contents.end())
+				return "image/" + val;
+			else
+			{
+				contents.clear();
+				contents.push_back("css");
+				contents.push_back("html");
+				contents.push_back("js");
+				contents.push_back("txt");
+				contents.push_back("json");
+				if (std::find(contents.begin(), contents.end(), val) != contents.end())
+					return "text/" + val;
+				else
+					return "text/plain";
+			}
 		std::string type = "text/" + this->index.substr(index.find(".") + 1);
 
+		std::cout << "typed: " << type << std::endl;
 		return type;
 	}
 

@@ -38,6 +38,7 @@ server::server(server_info servInfo)
 	contents.push_back(".gif");
 	contents.push_back(".ico");
 
+
 }
 
 void   server::clear_fd (int i)
@@ -83,7 +84,6 @@ void server::get_data_from_client(int i)
 		{
 			if (path.find(contents[i]) != std::string::npos)
 			{
-				std::cout << content_typer(contents,i) << std::endl;
 				std::string pathed = trim(this->serveInfo.locations["/"].root +  path);
 				std::ifstream file;
 
