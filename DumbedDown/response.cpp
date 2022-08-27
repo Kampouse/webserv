@@ -26,9 +26,7 @@ std::vector<std::string> listFilesRecursively( const char *basePath,std::vector<
 				if (dp->d_type == DT_DIR)
 				{
 					std::cout << "DIR: " << path << std::endl;
-					listFilesRecursively (path,lst,locations);
 					std::string s = path; 
-
 					 s =  s.substr( s.find("/")); 
 					lst.push_back(s);
 					locations[s].autoindex = true;
@@ -112,7 +110,6 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 				std::cout << "root?" << local_info.root  << std::endl;
 				std::cout <<  s.substr(local_info.root.length()) << std::endl;
 				std::cout << "hello " << lst_info[s].root << std::endl;  
-				listFilesRecursively(lst_info[s].root.c_str(),lst,lst_info);
 
 
 
@@ -126,7 +123,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 						for (size_t val = 0; val != files.size(); ++val )
 						{
 							std::cout << "path?->>>" << files[val] << std::endl;
-							content += "<tr><td><a href=\"" +  local_info.root +  files[val]+ "\">" + files[val] + "</a></td><td>" ;
+							content += "<tr><td><a href=\"" +  files[val]+ "\">" + files[val] + "</a></td><td>" ;
 							std::cout << files[val]<< std::endl;
 						}
 			}
