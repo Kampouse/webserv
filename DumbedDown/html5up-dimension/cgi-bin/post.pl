@@ -26,5 +26,8 @@ print "<h2>QUERY_STRING = $ENV{'QUERY_STRING'}</h2>";
 print "<h2>REMOTE_ADDR = $ENV{'REMOTE_ADDR'}</h2>";
 print "<h2>CONTENT_TYPE = $ENV{'CONTENT_TYPE'}</h2>";
 print "<h2>CONTENT_LENGTH = $ENV{'CONTENT_LENGTH'}</h2>";
+print "<h2>NAME = $ENV{'NAME'}</h2>";
+print "<h2>EMAIL = $ENV{'EMAIL'}</h2>";
+print "<h2>MESSAGE = $ENV{'MESSAGE'}</h2>";
 print "</body>";
 print "</html>";

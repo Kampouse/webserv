@@ -8,6 +8,8 @@
 
 #include "Server.hpp"
 
+class server;
+
 class CGI {
 	private:
 		char ** args;
@@ -17,12 +19,14 @@ class CGI {
 		std::string path;
 		std::string query;
 		std::string scriptName;
+		std::string data;
+		std::string body;
 		char buffer[100000];
 		std::string getExecPath();
 
 	public:
 		CGI();
-		CGI(server_info info, std::pair<std::string, std::string> page);
+		CGI(server_info info, std::pair<std::string, std::string> page, std::string _data);
 		~CGI();
 
 		void setExecArgs();

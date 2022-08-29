@@ -20,6 +20,7 @@
 #include <utility>
 #include <sstream>
 #include <filesystem>
+#include <dirent.h>
 
 #include "Exceptions.hpp"
 #include "config_structs.hpp"
@@ -65,6 +66,7 @@ class server {
 	private :
 		std::vector<std::string> contents;
 		void get_content_length(std::string buf);
+		void delete_upload(std::string path);
 
 };
 

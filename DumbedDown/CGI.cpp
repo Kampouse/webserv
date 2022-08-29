@@ -3,14 +3,22 @@
 CGI::CGI() {}
 CGI::~CGI() {}
 
-CGI::CGI(server_info info, std::pair<std::string, std::string> page)
+CGI::CGI(server_info info, std::pair<std::string, std::string> page, std::string _data)
 {
 	serverInfo = info;
 	request = page.first;
+	data = _data;
 	size_t pos = page.second.find("?");
 	path = info.locations["/"].root + page.second.substr(0, pos);
 	query = page.second.substr(pos + 1, std::string::npos);
 	scriptName = path.substr(path.find_last_of('/') + 1, std::string::npos);
+
+	pos = data.find("Accept-Language: ");
+	pos = data.find("\r\n\r\n", pos);
+	pos += 4;
+
+	body = data.substr(pos);
+
 	setEnvVars();
 	setExecArgs();
 	execCGI();
@@ -55,6 +63,7 @@ void CGI::setExecArgs()
 void CGI::setEnvVars()
 {
 	std::vector<std::string> vars;
+	size_t pos = 0;
 
 	vars.push_back("SERVER_SOFTWARE=webserv");
 	vars.push_back("SERVER_NAME=" + serverInfo.server_names);
@@ -67,11 +76,26 @@ void CGI::setEnvVars()
 	vars.push_back("SCRIPT_NAME=" + scriptName);
 	vars.push_back("QUERY_STRING=" + query);
 	vars.push_back("REMOTE_ADDR=" + serverInfo.host);
-	vars.push_back("CONTENT_TYPE=");
-	vars.push_back("CONTENT_LENGTH=");
+	vars.push_back("CONTENT_TYPE=text/html");
+	vars.push_back("CONTENT_LENGTH=" + IntToString(body.size()));
 
-	envp = new char*[14];
+	if (request == "POST")
+	{
+		pos = body.find("name=") + 5;
+		vars.push_back("NAME=" + body.substr(pos, body.find('&') - pos));
+
+		pos = body.find("email=") + 6;
+		vars.push_back("EMAIL=" + body.substr(pos, body.find('&', pos) - pos));
+
+		pos = body.find("message=") + 8;
+		vars.push_back("MESSAGE=" + body.substr(pos));
+	}
+
+	envp = new char*[17];
 	envp[13] = NULL;
+	envp[14] = NULL;
+	envp[15] = NULL;
+	envp[16] = NULL;
 
 	size_t i = 0;
 	size_t len;

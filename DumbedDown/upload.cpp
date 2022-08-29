@@ -7,7 +7,6 @@ upload::upload(server &serv, std::pair<std::string, std::string> page, std::stri
 	: serverInfo(serv.serveInfo), rqst(page), buffer(buf), filename("")
 {
 	// content_length = 100000000;
-	// std::cout << buffer << "\nHELLO\n";
 	struct stat s;
 	if (content_length > serverInfo.client_max_body_size)
 	{
@@ -98,13 +97,6 @@ void upload::write_file(server &serv)
 		}
 	}
 	size_t length = pos - start - 3;
-
-	// for (size_t i = 0; i < length; i++)
-	// 	std::cout << buffer[start + i];
-
-	// std::cout << "START = " << start << "\n";
-	// std::cout << "LENGTH = " << length << "\n";
-	// for (size_t i = start; i < length; i++)
 	ofs.write(&buffer[start], length);
 
 	ofs.close();

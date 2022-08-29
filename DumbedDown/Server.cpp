@@ -33,6 +33,43 @@ server::server(server_info servInfo)
 
 }
 
+void server::delete_upload(std::string path)
+{
+	DIR * d;
+	dirent * dir;
+	std::string file;
+	struct stat s;
+	int ret = 0;
+
+	d = opendir(path.c_str());
+	if (!d) {
+		resp.set_status_code(404);
+		return ;
+	}
+	while ((dir = readdir(d)))
+	{
+		file.clear();
+		file = path;
+		if (file.rfind('/') != file.size() - 1)
+			file.append("/");
+		file.append(dir->d_name);
+		if (file.rfind('.') == file.size() - 1)
+			continue ;
+		if (dir->d_type == DT_DIR)
+			file.append("/");
+		if ((stat(file.c_str(), &s) == 0) && (s.st_mode & S_IFDIR)) {
+			delete_upload(file);
+			ret = rmdir(file.c_str());
+		}
+		else
+			ret = unlink(file.c_str());
+		if (ret < 0)
+			std::cout << "Deleting error:" << errno << "\n";
+	}
+	rmdir(path.c_str());
+	closedir(d);
+}
+
 void server::get_content_length(std::string buf)
 {
 	unsigned int len = 0;
@@ -85,7 +122,7 @@ void server::get_data_from_client(int i)
 	get_content_length(buf);
 
 	buffer.clear();
-	buffer.insert(buffer.begin(), std::begin(buf), std::begin(buf) + ret);
+	buffer.insert(buffer.begin(), buf, buf + ret);
 
 	if (ret == BUF_SIZE && content_length > BUF_SIZE)
 	{
@@ -93,7 +130,7 @@ void server::get_data_from_client(int i)
 			bzero(buf, BUF_SIZE);
 			ret = recv(poll_set[i].fd, buf, BUF_SIZE, 0);
 			total_ret += ret;
-			buffer.insert(buffer.end(), std::begin(buf), std::begin(buf) + ret);
+			buffer.insert(buffer.end(), buf, buf + ret);
 		}
 	}
 	if(ret < 0){ return; }
@@ -131,15 +168,27 @@ void server::get_data_from_client(int i)
 
 
 		std::pair<std::string, std::string> page = find_page(*this, data);
-		if (page.first == "POST" && page.second == "/upload")
+		if (data.find("DELETE") != std::string::npos)
+		{
+			std::string upload_path;
+			std::map<std::string, location_info>::iterator it = serveInfo.locations.begin();
+			for (; it != serveInfo.locations.end(); it++) {
+				if (it->second.upload_dir != "") {
+					upload_path = it->second.upload_dir;
+					break ;
+				}
+			}
+			delete_upload(upload_path);
+		}
+		else if (page.first == "POST" && page.second == "/upload")
 		{
 			upload(*this, page, data, content_length);
 		}
 		else if (page.second.find("cgi-bin") != std::string::npos)
 		{
-
-			CGI cgi(serveInfo, page);
-			std::cout << "buffer->>>>>>>>>>>>>>"  <<  cgi.get_buffer();
+			std::cout << "DATA = \n" << data << "\n END OF DATA\n" ;
+			CGI cgi(serveInfo, page, data);
+			// std::cout << "buffer->>>>>>>>>>>>>>"  <<  cgi.get_buffer();
 			if (strlen(cgi.get_buffer().c_str()) != 0)
 				resp  = response(cgi.get_buffer());
 			else
