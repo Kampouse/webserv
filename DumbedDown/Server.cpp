@@ -1,4 +1,11 @@
-#include "Server.hpp"
+#include "Server.hpp"	
+#include <sstream>
+#include <filesystem>
+
+#include <dirent.h>
+#include <stdio.h>
+
+
 
 server::server(server_info servInfo)
 {
@@ -30,6 +37,7 @@ server::server(server_info servInfo)
 	contents.push_back(".jpeg");
 	contents.push_back(".gif");
 	contents.push_back(".ico");
+
 
 }
 
@@ -116,13 +124,18 @@ void server::get_data_from_client(int i)
 {
 	total_ret = 0;
 	char buf[BUF_SIZE];
-
+	std::string temp;
 	int ret = recv(poll_set[i].fd, buf, BUF_SIZE, 0);
 	total_ret += ret;
 	get_content_length(buf);
 
 	buffer.clear();
+<<<<<<< HEAD
 	buffer.insert(buffer.begin(), buf, buf + ret);
+=======
+	temp = buf;
+	buffer.insert(buffer.end(), buf, buf + ret);
+>>>>>>> f4ed8fae649b5772b54313ab7ee50a59d5a89d32
 
 	if (ret == BUF_SIZE && content_length > BUF_SIZE)
 	{
@@ -209,7 +222,10 @@ void server::get_data_from_client(int i)
 
 void server::get_data_from_server(int i)
 {
-	std::string http_response =  resp.build_response();
+	std::string http_response =  
+	
+	resp.build_response(serveInfo.locations);
+
 	int ret = send(poll_set[i].fd, http_response.c_str(), http_response.length(), 0);
 
 	if (ret < 0) { return; }

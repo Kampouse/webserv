@@ -5,7 +5,6 @@
 #include <cstring>
 #include <iostream>
 #include <map>
-
 #include "Server.hpp"
 
 class server;

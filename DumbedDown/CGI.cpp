@@ -1,4 +1,5 @@
 #include "CGI.hpp"
+#include "wait.h"
 
 CGI::CGI() {}
 CGI::~CGI() {}

@@ -1,7 +1,59 @@
 #include "response.hpp"
+#include <pthread.h>
 #include <sstream>
+#include "dirent.h"
+
 
 void response::set_status_code(int code) { status_code = code; }
+
+std::vector<std::string> listFilesRecursively( const char *basePath,std::vector<std::string>&lst,
+std::map<std::string,location_info >&locations)
+{
+    char path[1000];
+    struct dirent *dp;
+    DIR *dir = opendir(basePath);
+	std::vector<std::string> files;
+    // Unable to open directory stream
+    if (!dir)
+	{
+        return files;
+	}
+	locations[basePath].autoindex = true;
+	locations[basePath].root  = basePath ;
+    while ((dp = readdir(dir)) != NULL)
+    {
+        if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0)
+        {
+            strcpy(path, basePath);
+            strcat(path, "/");
+            strcat(path, dp->d_name);
+				if (dp->d_type == DT_DIR)
+				{
+					std::string s = path; 
+					 s =  s.substr( s.find("/")); 
+					lst.push_back(s);
+				
+					locations[s].autoindex = true;
+					locations[s].root = path;
+				}
+				else if (dp->d_type == DT_REG)
+				{
+
+					std::string s = path; 
+					 s =  s.substr( s.find("/")); 
+					 files.push_back (s);
+					locations[s].autoindex = false;
+					locations[s].root = s;
+					locations[s].index = s;
+				}
+       }
+	
+	}
+	closedir(dir);
+
+	return files;
+    }
+
 
 std::string readfile(std::string path)
 {
@@ -12,7 +64,45 @@ std::string readfile(std::string path)
 	return buffer.str();
 }
 
-std::string  response::build_response(void)
+
+std::string list_directory(std::string&content_type,std::string&content,int&content_length,location_info local_info, std::map<std::string,location_info> &lst_info  )
+{
+			content_type = "text/html";
+			content = "<!DOCTYPE html><html><head><title>Index of " + local_info.root + 
+			"</title></head><body><h1>Index of " + local_info.root + 
+			"</h1><table><tr><th>Name</th><th>Last modified</th><th>Size</th></tr>";
+				std::vector<std::string> lst;
+			 std::vector<std::string> files =	listFilesRecursively(local_info.root.c_str(),lst,lst_info);
+			for (std::vector<std::string>::iterator it = lst.begin(); it != lst.end(); ++it)
+			{
+				std::string s = *it; 
+				content += "<tr><td><a href=\"" +  s + "\">" + s  + "</a></td><td>" ;
+			}
+			if(files.size() != 0)
+			{
+						for (size_t val = 0; val != files.size(); ++val )
+						{
+							content += "<tr><td><a href=\"" +  files[val]+ "\">" + files[val] + "</a></td><td>" ;
+						}
+			}
+		
+			content += "</table></body></html>";
+return content;
+}
+
+std::string forbiden_access(std::string&content,std::string&content_type,std::string root) 
+{
+	content = "<!DOCTYPE html><html><head><title>Forbide to access</title></head><body><h1>Forbiden accces to " 
+	+ root + "</h1>";
+	content += "</table></body></html>";
+	content_type = "text/html";
+	return content;
+}
+
+
+
+
+std::string  response::build_response(std::map<std::string,location_info> &lst_info )
 {
 	std::string content;
 	time_t rawtime;
@@ -30,7 +120,6 @@ std::string  response::build_response(void)
 	}
 	else if (status_code == 200 && this->content  != "")
 	{
-		std::cout << "hello " << this->content << std::endl;
 		content = this->content;
 		content_length = strlen(this->content.c_str());
 		content_type = "text/html";
@@ -38,15 +127,18 @@ std::string  response::build_response(void)
 	else if(status_code != 200)
 	{
 		content  = 	local_info.find_error_page( error_page[status_code]);
-		std::cout << "error " << content << std::endl;
 		content_length = content.length();
 		content_type = "text/html";
 	}
 	else if(status_code == 200 && type == "")
 	{
 		content = local_info.find_content();
-		content_length = content.length();
 		content_type = local_info.find_type();
+		if(content_type == "text/plain" && local_info.autoindex == true)
+			content = list_directory(content_type,content,content_length,local_info,lst_info);
+		else if(content_type == "text/plain" && local_info.autoindex == false)
+			forbiden_access(content,content_type,local_info.root);
+			content_length = content.length();
 	}
 	else if (status_code == 200 && type != "")
 	{
@@ -60,6 +152,11 @@ std::string  response::build_response(void)
 		content_length = content.length();
 		content_type = "text/html";
 	}
+
+	 std::string str_path = "." + local_info.root;
+	std::string str;
+	 if(local_info.index != "" && (str = readfile(str_path)).length() != 0)
+				 content_type = local_info.find_type();
 	ss << content_length;
 	std::string content_length_str = ss.str();
     time (&rawtime);
@@ -69,11 +166,24 @@ std::string  response::build_response(void)
 	response += "Date: " + std::string(time_string) + "\r\n";
 	if (local_info.redirect_to != "")
 		response += "Location: " + local_info.redirect_to + "\r\n";
-	response += "Content-Type: " + content_type + "\r\n";
-	response += "Content-Length: " + content_length_str  + "\r\n";
+	if (str.length() !=0)
+	 {
+		 std::stringstream ssd;
+		 ssd << str.length();
+		 content_length_str = ssd.str();
+		 response += "Content-Length: " + content_length_str + "\r\n";
+	 }
+	else
+		response += "Content-Length: " + content_length_str + "\r\n";
 	response += "\r\n";
-	std::cout << response << std::endl;
-	response += content;
+	if(str != "")
+	{
+		response += str;
+	}
+	else
+	{
+		response += content;
+	}
 	return response;
 }
 
