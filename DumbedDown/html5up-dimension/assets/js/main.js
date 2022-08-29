@@ -404,9 +404,10 @@ const fn = (res)=>{}
 
 const deleteBtn = document.getElementById("deleteBtn");
 if (deleteBtn) {
-	deleteBtn.addEventListener("click", function (event) {
+	deleteBtn.addEventListener("click", (event)=>{
 		event.preventDefault();
-		alert("Deleted successfully!");
+		alert("Upload Directory Deleted");
 		axios.delete("http://127.0.0.1:8081/upload").then(fn);
 	})
+	 
 }

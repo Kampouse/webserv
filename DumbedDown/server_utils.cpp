@@ -30,11 +30,10 @@ std::pair<std::string, std::string> find_page(server &serv, std::string &path)
 			break;
 		}
 	}
-	std::string::size_type  start =  path.find(allowed_requests[pos]);
-	std::string::size_type  end =  path.find("HTTP") - 4;
-	std::string page = path.substr(start + allowed_requests[pos].size(), end);
-	std::string::size_type  start_page =  page.find("/");
-	page = page.substr(start_page, end);
+	std::string page;
+	std::string::size_type  end =  path.find("HTTP") - 1;
+	std::string::size_type  start =  path.find("/");
+	page = path.substr(start, end - start);
 	return (std::make_pair<std::string, std::string>(allowed_requests[pos], page));
 }
 

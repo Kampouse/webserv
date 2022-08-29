@@ -25,6 +25,8 @@ struct location_info {
 	bool								is_dir;
 
 	location_info() {
+		autoindex = false;
+		upload_dir = "";
 		redirect_to = "";
 		redirect_code = 0;
 		autoindex = false;
@@ -32,8 +34,9 @@ struct location_info {
 	}
 
 	location_info(std::string rooted) {
-		autoindex = false;
 		root = rooted;
+		autoindex = false;
+		upload_dir = "";
 		redirect_to = "";
 		redirect_code = 0;
 		is_dir = false;

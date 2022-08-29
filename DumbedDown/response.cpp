@@ -3,6 +3,9 @@
 #include <sstream>
 #include "dirent.h"
 
+
+void response::set_status_code(int code) { status_code = code; }
+
 std::vector<std::string> listFilesRecursively( const char *basePath,std::vector<std::string>&lst,
 std::map<std::string,location_info >&locations)
 {
@@ -108,7 +111,14 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	int content_length;
 	std::stringstream ss;
 	std::string content_type ;
-	 if (status_code == 200 && this->content  != "")
+	std::cout << status_code << "\n";
+	if (status_code == 200 && this->content == "/upload")
+	{
+		content = readfile("./resources/success/upload_success.html");
+		content_length = content.length();
+		content_type = "text/html";
+	}
+	else if (status_code == 200 && this->content  != "")
 	{
 		content = this->content;
 		content_length = strlen(this->content.c_str());
@@ -178,7 +188,8 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 }
 
 response::response():path(""){}
-response::response(std::string reponse_string):content(reponse_string),status_code(200){}
+response::response(std::string reponse_string) : content(reponse_string), status_code(200){}
+
 response::response(std::string &path,std::string &type):path(path),type(type)
 {
 	if (path == "")

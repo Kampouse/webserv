@@ -1,5 +1,5 @@
 #include "CGI.hpp"
-
+#include "wait.h"
 CGI::CGI() {}
 CGI::~CGI() {}
 
@@ -8,8 +8,7 @@ CGI::CGI(server_info info, std::pair<std::string, std::string> page)
 	serverInfo = info;
 	request = page.first;
 	size_t pos = page.second.find("?");
-	//remove this hardcode 
-	path = "./html5up-dimension" + page.second.substr(0, pos);
+	path = info.locations["/"].root + page.second.substr(0, pos);
 	query = page.second.substr(pos + 1, std::string::npos);
 	scriptName = path.substr(path.find_last_of('/') + 1, std::string::npos);
 	setEnvVars();
@@ -63,8 +62,8 @@ void CGI::setEnvVars()
 	vars.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	vars.push_back("SERVER_PORT=" + IntToString( serverInfo.port));
 	vars.push_back("REQUEST_METHOD=" + request);
-	vars.push_back("PATH_INFO=./" + path);
-	vars.push_back("PATH_TRANSLATED=./" + path);
+	vars.push_back("PATH_INFO=" + path);
+	vars.push_back("PATH_TRANSLATED=" + path);
 	vars.push_back("SCRIPT_NAME=" + scriptName);
 	vars.push_back("QUERY_STRING=" + query);
 	vars.push_back("REMOTE_ADDR=" + serverInfo.host);
@@ -93,7 +92,7 @@ void CGI::execCGI()
 	int status;
 
 	// std::cout << path << "\n";
-int fd_f= 0;
+	int fd_f= 0;
 
    if( (fd_f = open(args[0], O_RDONLY)) < 0)
    {
@@ -115,7 +114,7 @@ int fd_f= 0;
 		close(fd[1]);
 		execve(args[0], args, envp);
 		exit(1);
-	 std::cout << "execve failed\n";
+		std::cout << "execve failed\n";
 	}
 	else
 	{

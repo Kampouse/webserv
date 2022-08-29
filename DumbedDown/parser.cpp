@@ -27,7 +27,6 @@ static  int convert_to_number(std::string str) {
 	return num;
 }
 
-
 parser::parser(std::string _path) {
 	parsefile(_path);
 }
@@ -219,6 +218,7 @@ void parser::get_server_fields(void)
 				if (!std::isdigit(data[0]))
 					throw Exceptions::InvalidFieldError("client_max_body_size");
 				servers.back().client_max_body_size = atoi(data.c_str());
+				servers.back().client_max_body_size *= 1000000;
 				pos = 0;
 				while (std::isdigit(data[pos]))
 					pos++;

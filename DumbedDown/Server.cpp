@@ -41,6 +41,22 @@ server::server(server_info servInfo)
 
 }
 
+void server::get_content_length(std::string buf)
+{
+	unsigned int len = 0;
+	size_t pos = buf.find("Content-Length: ");
+	if (pos != std::string::npos)
+	{
+		pos += 16;
+		while (std::isdigit(buf[pos])) {
+			len *= 10;
+			len += ((int)(buf[pos]) - 48);
+			pos++;
+		}
+	}
+	content_length = len;
+}
+
 void   server::clear_fd (int i)
 {
 	close(poll_set[i].fd);
@@ -69,26 +85,42 @@ void server::add_client (void)
 
 void server::get_data_from_client(int i)
 {
+	total_ret = 0;
 	char buf[BUF_SIZE];
-	std::string data;
+	std::string temp;
 	int ret = recv(poll_set[i].fd, buf, BUF_SIZE, 0);
+	total_ret += ret;
+	get_content_length(buf);
+
+	buffer.clear();
+	temp = buf;
+	buffer.insert(buffer.end(), buf, buf + ret);
+
+	if (ret == BUF_SIZE && content_length > BUF_SIZE)
+	{
+		while (ret == BUF_SIZE) {
+			bzero(buf, BUF_SIZE);
+			ret = recv(poll_set[i].fd, buf, BUF_SIZE, 0);
+			total_ret += ret;
+			buffer.insert(buffer.end(), buf, buf + ret);
+		}
+	}
 	if(ret < 0){ return; }
 	else if(ret == 0){ clear_fd(i); }
 	else
 	{
-		data = buf;
-		std::cout << buf << "\n";
-		std::cout << data ;
-		std::string path = data.substr(data.find("/"), data.find("HTTP") - 4);
+		std::string data(buffer.begin(), buffer.end());
+		// std::cout << "RET = " << total_ret << "\n";
+		// std::cout << "DATA = \n" << data << "\n" ;
+		std::string path = data.substr(data.find("/"), data.find("HTTP") - data.find("/") - 1);
 		for (unsigned int i = 0; i < contents.size(); i++)
 		{
 			if (path.find(contents[i]) != std::string::npos)
 			{
+				// std::cout << content_typer(contents,i) << std::endl;
 				std::string pathed = trim(this->serveInfo.locations["/"].root +  path);
 				std::ifstream file;
 
-				// std::string path = "./html5up-dimension" + pathed;
-				// file_list();
 				file.open(pathed.c_str());
 				if (!file.is_open())
 				{
@@ -107,18 +139,18 @@ void server::get_data_from_client(int i)
 		}
 
 
-
-
-
-
 		std::pair<std::string, std::string> page = find_page(*this, data);
-		if (page.second.find("cgi-bin") != std::string::npos)
+		if (page.first == "POST" && page.second == "/upload")
+		{
+			upload(*this, page, data, content_length);
+		}
+		else if (page.second.find("cgi-bin") != std::string::npos)
 		{
 
 			CGI cgi(serveInfo, page);
 			std::cout << "buffer->>>>>>>>>>>>>>"  <<  cgi.get_buffer();
-			if(strlen(cgi.get_buffer().c_str()) != 0)
-					resp  = response(cgi.get_buffer());
+			if (strlen(cgi.get_buffer().c_str()) != 0)
+				resp  = response(cgi.get_buffer());
 			else
 			{
 				/// correct error page here!!
