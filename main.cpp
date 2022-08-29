@@ -45,11 +45,18 @@ std::vector<server> servers_starter(std::vector<server_info> lst_config)
 	return(lst_servers);
 }
 
+void close_serv(int sig)
+{
+	(void)sig;
+	throw std::runtime_error("Server terminated!");
+}
+
 int main(void)
 {
+	signal(SIGQUIT, close_serv);
+	signal(SIGINT, close_serv);
 
 	std::cout << "server as started! " << std::endl;
-
 	// handle server socket so it avoid  sigpipe
 	// signal(SIGPIPE, SIG_IGN);
 	parser parser("default.conf");
