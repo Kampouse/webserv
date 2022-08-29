@@ -130,12 +130,7 @@ void server::get_data_from_client(int i)
 	get_content_length(buf);
 
 	buffer.clear();
-<<<<<<< HEAD
 	buffer.insert(buffer.begin(), buf, buf + ret);
-=======
-	temp = buf;
-	buffer.insert(buffer.end(), buf, buf + ret);
->>>>>>> f4ed8fae649b5772b54313ab7ee50a59d5a89d32
 
 	if (ret == BUF_SIZE && content_length > BUF_SIZE)
 	{
