@@ -29,6 +29,7 @@ std::map<std::string,location_info >&locations)
 					std::string s = path; 
 					 s =  s.substr( s.find("/")); 
 					lst.push_back(s);
+					if( )
 					locations[s].autoindex = true;
 					locations[s].root = path;
 				}
@@ -60,6 +61,44 @@ std::string readfile(std::string path)
 	return buffer.str();
 }
 
+
+std::string list_directory(std::string&content_type,std::string&content,int&content_length,location_info local_info, std::map<std::string,location_info> &lst_info  )
+{
+			content_type = "text/html";
+			content = "<!DOCTYPE html><html><head><title>Index of " + local_info.root + 
+			"</title></head><body><h1>Index of " + local_info.root + 
+			"</h1><table><tr><th>Name</th><th>Last modified</th><th>Size</th></tr>";
+				std::vector<std::string> lst;
+			 std::vector<std::string> files =	listFilesRecursively(local_info.root.c_str(),lst,lst_info);
+			for (std::vector<std::string>::iterator it = lst.begin(); it != lst.end(); ++it)
+			{
+				std::string s = *it; 
+				content += "<tr><td><a href=\"" +  s + "\">" + s  + "</a></td><td>" ;
+			}
+			if(files.size() != 0)
+			{
+						for (size_t val = 0; val != files.size(); ++val )
+						{
+							content += "<tr><td><a href=\"" +  files[val]+ "\">" + files[val] + "</a></td><td>" ;
+						}
+			}
+		
+			content += "</table></body></html>";
+return content;
+}
+
+std::string forbiden_access(std::string&content,std::string&content_type,std::string root) 
+{
+	content = "<!DOCTYPE html><html><head><title>Forbide to access</title></head><body><h1>Forbiden accces to " 
+	+ root + "</h1>";
+	content += "</table></body></html>";
+	content_type = "text/html";
+	return content;
+}
+
+
+
+
 std::string  response::build_response(std::map<std::string,location_info> &lst_info )
 {
 	std::string content;
@@ -84,31 +123,13 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	else if(status_code == 200 && type == "")
 	{
 		content = local_info.find_content();
-		content_length = content.length();
 		content_type = local_info.find_type();
 		if(content_type == "text/plain" && local_info.autoindex == true)
-		{
-			content_type = "text/html";
-			content = "<!DOCTYPE html><html><head><title>Index of " + local_info.root + 
-			"</title></head><body><h1>Index of " + local_info.root + 
-			"</h1><table><tr><th>Name</th><th>Last modified</th><th>Size</th></tr>";
-				std::vector<std::string> lst;
-			 std::vector<std::string> files =	listFilesRecursively(local_info.root.c_str(),lst,lst_info);
-			for (std::vector<std::string>::iterator it = lst.begin(); it != lst.end(); ++it)
-			{
-				std::string s = *it; 
-				content += "<tr><td><a href=\"" +  s + "\">" + s  + "</a></td><td>" ;
-			}
-			if(files.size() != 0)
-			{
-						for (size_t val = 0; val != files.size(); ++val )
-						{
-							content += "<tr><td><a href=\"" +  files[val]+ "\">" + files[val] + "</a></td><td>" ;
-						}
-			}
-		}
+			content = list_directory(content_type,content,content_length,local_info,lst_info);
+		else if(content_type == "text/plain" && local_info.autoindex == false)
+			forbiden_access(content,content_type,local_info.root);
 			content_length = content.length();
-		}
+	}
 	else if (status_code == 200 && type != "")
 	{
 		content = readfile(path);
@@ -122,15 +143,10 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 		content_type = "text/html";
 	}
 
-     std::string str = readfile("." + local_info.root);
 	 std::string str_path = "." + local_info.root;
-	 std::string val;
-	 if (str.length() !=0)
-	 {
-		 std::cout << "the type is " <<  	local_info.find_type();
-			 content_type = local_info.find_type();
-			val = str;
-	 }
+	std::string str;
+	 if(local_info.index != "" && (str = readfile(str_path)).length() != 0)
+				 content_type = local_info.find_type();
 	ss << content_length;
 	std::string content_length_str = ss.str();
     time (&rawtime);
@@ -143,7 +159,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	if (str.length() !=0)
 	 {
 		 std::stringstream ssd;
-		 ssd << val.length();
+		 ssd << str.length();
 		 content_length_str = ssd.str();
 		 response += "Content-Length: " + content_length_str + "\r\n";
 	 }
@@ -152,7 +168,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	response += "\r\n";
 	if(str != "")
 	{
-		response += val;
+		response += str;
 	}
 	else
 	{

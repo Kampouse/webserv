@@ -4,7 +4,6 @@
 #include <vector>
 #include <cstring>
 #include <iostream>
-#include <wait.h>
 #include <map>
 #include "Server.hpp"
 
