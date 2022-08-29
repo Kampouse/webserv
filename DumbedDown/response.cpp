@@ -29,7 +29,7 @@ std::map<std::string,location_info >&locations)
 					std::string s = path; 
 					 s =  s.substr( s.find("/")); 
 					lst.push_back(s);
-					if( )
+				
 					locations[s].autoindex = true;
 					locations[s].root = path;
 				}
