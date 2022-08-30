@@ -71,18 +71,15 @@ void upload::write_file(server &serv)
 	size_t start = buffer.find("filename=\"");
 	start = buffer.find("\r\n\r\n", start);
 	start += 4;
-	// std::cout << "START = " << start << "\n";
 
 	size_t pos = buffer.find("boundary") + 9;
 	std::string boundary = buffer.substr(pos, buffer.find("\r\n", pos) - pos);
 	boundary.insert(0, "--");
 
-	// std::cout << "BOUNDARY = " << boundary << "END OF BOUNDARY\n";
-
 	const char * str = buffer.c_str();
 	char * ptr;
 	pos = start;
-	while (pos < serv.total_ret)
+	while (pos < serv.getTotalRet())
 	{
 		size_t len = strlen(str + pos);
 		ptr = (char *)memchr(str + pos, '-', len);

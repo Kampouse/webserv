@@ -1,16 +1,16 @@
 #pragma once
 
-# include <fstream> 
-# include <iostream>
-# include <map>
-# include <set>
-# include <vector>
-# include <string>
-# include <stdlib.h>
+#include <fstream> 
+#include <vector>
+#include <cstring>
+#include <sstream>
 
 #include "config_structs.hpp"
 #include "Exceptions.hpp"
-#include "utils.hpp"
+
+#if OS_LINUX
+#include <bits/stdc++.h>
+#endif
 
 class Exceptions;
 
@@ -28,11 +28,9 @@ class parser
 		void manage_locations(std::vector<std::string>::iterator it);
 
 	public:
-		std::vector<server_info>&get_servers(void);
 		parser();
 		parser(std::string _path);
 		~parser();
-		std::vector<server_info>&getServers();
 
-		void printfile(void);
+		std::vector<server_info>& getServers();
 };

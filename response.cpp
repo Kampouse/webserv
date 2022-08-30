@@ -1,8 +1,49 @@
 #include "response.hpp"
-#include <pthread.h>
-#include <sstream>
-#include "dirent.h"
 
+response::response() : path(""){}
+response::~response() {}
+
+response::response(std::string reponse_string) : content(reponse_string), status_code(200){}
+
+response::response(std::string &path,std::string &type):path(path),type(type)
+{
+	if (path == "")
+	{
+		status_code = 404;
+		status = "404 Not Found";
+	}
+	else
+	{
+		status_code = 200;
+		status = "200 OK";
+	}
+}
+
+response::response(location_info local_info, std::map<int, std::string> error_page, std::string &path)
+	: error_page(error_page), path(path)
+{
+	this->type = "";
+	this->local_info = local_info;
+	this->path = path;
+
+	if(local_info.redirect_to != "")
+	{
+		this->status = "301 Moved Permanently"; 
+		this->status_code = 301;
+	}
+	else if (local_info.root == "")
+	{
+		this->status = "404 Not Found";
+		this->status_code = 404;
+
+	}
+	else
+	{
+		this->status = "200 OK";
+		this->status_code = 200;
+
+	}
+}
 
 void response::set_status_code(int code) { status_code = code; }
 
@@ -100,7 +141,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	int content_length;
 	std::stringstream ss;
 	std::string content_type ;
-	std::cout << status_code << "\n";
+
 	if (status_code == 200 && this->content == "/upload")
 	{
 		content = readfile("./resources/success/upload_success.html");
@@ -145,17 +186,20 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 		content_type = "text/html";
 	}
 
-	 std::string str_path = "." + local_info.root;
+	std::string str_path = "." + local_info.root;
 	std::string str;
-	 if(local_info.index != "" && (str = readfile(str_path)).length() != 0)
-				 content_type = local_info.find_type();
+	if(local_info.index != "" && (str = readfile(str_path)).length() != 0)
+		content_type = local_info.find_type();
 	ss << content_length;
 	std::string content_length_str = ss.str();
-    time (&rawtime);
+
+    time(&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(time_string,80,"%a, %b %d %H:%M:%S %Y",timeinfo);
+    strftime(time_string, 80, "%a, %b %d %H:%M:%S %Y", timeinfo);
+
 	std::string response = "HTTP/1.1 " + status + "\r\n";
 	response += "Date: " + std::string(time_string) + "\r\n";
+
 	if (local_info.redirect_to != "")
 		response += "Location: " + local_info.redirect_to + "\r\n";
 	if (str.length() !=0)
@@ -179,23 +223,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	return response;
 }
 
-response::response():path(""){}
-response::response(std::string reponse_string) : content(reponse_string), status_code(200){}
-
-response::response(std::string &path,std::string &type):path(path),type(type)
-{
-	if (path == "")
-	{
-		status_code = 404;
-		status = "404 Not Found";
-	}
-	else
-	{
-		status_code = 200;
-		status = "200 OK";
-	}
-}
-void response ::set_response(int status_code)
+void response::set_response(int status_code)
 {
 	std::stringstream  ss;
 	std::string status;
@@ -220,30 +248,5 @@ void response ::set_response(int status_code)
 	{
 		this->status_code = status_code;
 		status = "200 OK";
-	}
-}
-
-response::response(location_info local_info, std::map<int, std::string> error_page, std::string &path) : error_page(error_page), path(path)
-{
-	this->type = "";
-	this->local_info = local_info;
-	this->path = path;
-
-	if(local_info.redirect_to != "")
-	{
-		this->status = "301 Moved Permanently"; 
-		this->status_code = 301;
-	}
-	else if (local_info.root == "")
-	{
-		this->status = "404 Not Found";
-		this->status_code = 404;
-
-	}
-	else
-	{
-		this->status = "200 OK";
-		this->status_code = 200;
-
 	}
 }

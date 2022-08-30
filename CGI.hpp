@@ -1,10 +1,8 @@
 #pragma once
 
-#include <unistd.h>
-#include <vector>
-#include <cstring>
-#include <iostream>
 #include <map>
+#include <unistd.h>
+
 #include "Server.hpp"
 
 class server;
@@ -22,6 +20,18 @@ class CGI {
 		std::string body;
 		char buffer[100000];
 		std::string getExecPath();
+
+		// Convert Numerical type to String
+		template <typename T>
+		std::string IntToString(const T& num) {
+			std::stringstream ss;
+			std::string str;
+
+			ss << num;
+			ss >> str;
+
+			return str;
+		}
 
 	public:
 		CGI();

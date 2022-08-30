@@ -1,29 +1,15 @@
 #include "parser.hpp"
-#include "config_structs.hpp"
-#include <iterator>
-#include <sstream>
-#include <string>
-#include <algorithm>
-#if OS_LINUX
-#include <bits/stdc++.h>
-#endif
-
-#include <cstdlib>
-#include <exception>
 
 parser::parser() {}
-
 parser::~parser() {}
 
-
-
-static  int convert_to_number(std::string str) {
+static int convert_to_number(std::string str)
+{
 	std::stringstream ss(str);
 	int num;
 	ss >> num;
-  if (ss.fail()) {
-	throw std::runtime_error("Could not convert string to number");
-  }
+	if (ss.fail())
+		throw std::runtime_error("Could not convert string to number");
 	return num;
 }
 
@@ -33,11 +19,11 @@ parser::parser(std::string _path) {
 
 static std::string trim(const std::string& str)
 {
-    size_t first = str.find_first_not_of(WHITESPACES);
-    if (first == std::string::npos)
-        return str;
-    size_t last = str.find_last_not_of(WHITESPACES);
-    return str.substr(first, (last - first + 1));
+	size_t first = str.find_first_not_of(WHITESPACES);
+	if (first == std::string::npos)
+		return str;
+	size_t last = str.find_last_not_of(WHITESPACES);
+	return str.substr(first, (last - first + 1));
 }
 
 void parser::extractfile()
@@ -70,14 +56,14 @@ void parser::extractfile()
 	}
 }
 
-void parser::check_errors(void) {
+void parser::check_errors(void)
+{
 	std::string line;
 	int bracket_state = 0;
 	parsing_state state = CONFIG_FIELD;
 	std::vector<std::string>::iterator it = ext_file.begin();
 
 	while (it != ext_file.end()) {
-		// this line assume that the config file is well formed
 		if (*it == "server" && bracket_state != 0)
 			throw Exceptions::NestedServerError();
 
@@ -101,7 +87,6 @@ void parser::check_errors(void) {
 
 		if (bracket_state == -1)
 			throw Exceptions::ConfigError();
-//hack might be broken 
 		if (state == CONFIG_FIELD && (*it).at((it)->length() - 1) != ';')
 			throw Exceptions::SemicolonError();
 		it++;
@@ -244,20 +229,8 @@ void parser::parsefile(std::string path)
 		throw Exceptions::FileOpeningError(path);
 	extractfile();
 	this->config_file_fd.close();
-	// printfile();
 	check_errors();
 	get_server_fields();
 }
 
 std::vector<server_info>&parser::getServers() { return (servers); }
-
-void parser::printfile(void)
-{
-	std::vector<std::string>::iterator it = ext_file.begin();
-	while (it != ext_file.end())
-		std::cout << *it++ << "\n";
-}
-std::vector<server_info>&parser::get_servers(void)
-{
-	return servers;
-}

@@ -1,21 +1,16 @@
-
 #pragma once
 
 #include <map>
-#include <string>
+#include <cstring>
 #include <vector>
-#include <stdbool.h>
 #include <netinet/in.h>
-#include <iostream> 
 #include <fstream> 
-#include <ctime>
-#include <algorithm> 
 
 #define WHITESPACES "\t\n\v\f\r "
 
 struct location_info {
-	std::string								redirect_to;
-	int 									redirect_code;
+	std::string							redirect_to;
+	int 								redirect_code;
 	std::string							root;
 	std::map<std::string, std::string>	cgi;
 	std::vector<std::string>			allowed_requests;
@@ -42,15 +37,6 @@ struct location_info {
 		is_dir = false;
 	}
 
-  
-
-
-
-
-
-
-
-
 	std::string find_error_page(std::string path) const
 	{
 		std::string data;
@@ -67,13 +53,12 @@ struct location_info {
 
 	std::string find_content() const
 	{
-		//open file and read it into a string
 		std::string data;
 		std::string file_path = root + "/" +  index;
 		std::ifstream file(file_path.c_str());
 		std::string line;
 
-		while (std::getline(file, line)){
+		while (std::getline(file, line)) {
 			data += line;
 		}
 
@@ -83,8 +68,6 @@ struct location_info {
 
 	std::string find_type() const
 	{
-		// applicaton text plain  default if cant find;
-	
 		std::vector<std::string>contents;
 		std::string val =  this->index.substr(index.find(".") + 1);
 			contents.push_back("png");
@@ -109,8 +92,6 @@ struct location_info {
 					return "text/plain";
 			}
 		std::string type = "text/" + this->index.substr(index.find(".") + 1);
-
-		std::cout << "typed: " << type << std::endl;
 		return type;
 	}
 
@@ -138,10 +119,6 @@ struct location_info {
 		for (it2 = test.allowed_requests.begin(); it2 != test.allowed_requests.end(); it2++) {
 			os << "allowed_requests: " << *it2 << std::endl;
 		}
-		std::cout << "content_type: " <<   test.find_type()   << std::endl;
-		//maybe wirte this part in a function before sending it so you can reuse the content value
-		std::cout << "content_length: " << test.find_content().length() << std::endl;
-		std::cout << "time: " << time << std::endl;
 		return os;
 	}
 };
@@ -152,14 +129,12 @@ struct server_info {
 	std::string								server_names;
 	std::map<int, std::string>				error_pages;
 	unsigned int							client_max_body_size;
-	int										server_fd;
 	struct sockaddr_in						address;
 	std::map<std::string, location_info>	locations;
 
 	server_info() {
 		client_max_body_size = 0;
 		port = 0;
-		server_fd = 0;
 		server_names = "localhost";
 	}
 

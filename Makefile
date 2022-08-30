@@ -2,7 +2,7 @@ NAME = webserv
 CC = g++
 FLAGS =   --std=c++98 -g
 
-SRCS = Exceptions.cpp main.cpp parser.cpp utils.cpp Server.cpp server_utils.cpp response.cpp CGI.cpp upload.cpp
+SRCS = Exceptions.cpp main.cpp parser.cpp Server.cpp server_utils.cpp response.cpp CGI.cpp upload.cpp
 
 
 RM =  rm -rf
@@ -35,7 +35,7 @@ fclean: clean
 	@${RM} ${NAME_TEST}
 
 git:
-		@git add ${SRCS} Makefile Exceptions.hpp config_structs.hpp parser.hpp utils.hpp Server.hpp response.hpp CGI.hpp
+		@git add ${SRCS} Makefile Exceptions.hpp config_structs.hpp parser.hpp Server.hpp response.hpp CGI.hpp
 
 re: fclean all
 	

@@ -1,38 +1,5 @@
-#include <iostream>
-#include <string>
-#include <list>
-#include <sys/fcntl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <unistd.h>
-#include "poll.h" 
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
-
-#include "Exceptions.hpp"
-#include "config_structs.hpp"
-#include "parser.hpp"
-#include "utils.hpp"
 #include "Server.hpp"
-
-#define SERVER_IP "127.0.0.1"
-#define SERVER_PORT 8888
-#define EPOLL_SIZE 5000
-#define BUF_SIZE 0xFFFF
-
-
-
-int nonblock(int sockfd)
-{
-	fcntl(sockfd, F_SETFL, O_NONBLOCK);
-	return 0;
-}
-
+#include "parser.hpp"
 
 std::vector<server> servers_starter(std::vector<server_info> lst_config)
 {
@@ -48,6 +15,7 @@ std::vector<server> servers_starter(std::vector<server_info> lst_config)
 void close_serv(int sig)
 {
 	(void)sig;
+	std::cout << "\n\n";
 	throw std::runtime_error("Server terminated!");
 }
 
@@ -57,10 +25,8 @@ int main(void)
 	signal(SIGINT, close_serv);
 
 	std::cout << "server as started! " << std::endl;
-	// handle server socket so it avoid  sigpipe
-	// signal(SIGPIPE, SIG_IGN);
 	parser parser("default.conf");
-	std::vector<server_info> servers_info = parser.get_servers();
+	std::vector<server_info> servers_info = parser.getServers();
 	
 	for (std::vector<server_info>::iterator it = servers_info.begin(); it != servers_info.end(); ++it)
 	{
@@ -76,6 +42,4 @@ int main(void)
 		}
 	}
 	return (0);
-
 }
-

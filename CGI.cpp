@@ -115,13 +115,10 @@ void CGI::execCGI()
 	pid_t pid;
 	int status;
 
-	// std::cout << path << "\n";
 	int fd_f= 0;
 
    if( (fd_f = open(args[0], O_RDONLY)) < 0)
-   {
-	   return;
-   }
+	   return ;
    else
 	   close(fd_f);
 	pipe(fd);
@@ -159,5 +156,4 @@ void CGI::execCGI()
 		delete[] envp;
 	}
 	close(in);
-	std::cout << buffer ;
 }

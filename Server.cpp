@@ -1,34 +1,29 @@
 #include "Server.hpp"	
-#include <sstream>
-#include <filesystem>
-
-#include <dirent.h>
-#include <stdio.h>
-
-
 
 server::server(server_info servInfo)
 {
-
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(servInfo.port);
 	server_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
+
 	serveInfo = servInfo;
+
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	fcntl(server_fd, F_SETFL, O_NONBLOCK);
 	setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &server_addr, sizeof(server_addr));
 	bzero(&(server_addr.sin_zero), 8);
+
 	if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0)
-	{
-		return;
-	}
+		return ;
 
 	listen(server_fd, 100);
+
 	pollfd serv;
 	serv.fd = server_fd;
 	serv.events = POLLIN | POLLHUP | POLLERR;
 	serv.revents = 0;
 	poll_set.push_back(serv);
+
 	contents.push_back(".css");
 	contents.push_back(".html");
 	contents.push_back(".js");
@@ -37,8 +32,6 @@ server::server(server_info servInfo)
 	contents.push_back(".jpeg");
 	contents.push_back(".gif");
 	contents.push_back(".ico");
-
-
 }
 
 void server::delete_upload(std::string path)
@@ -111,7 +104,6 @@ void server::add_client (void)
 	{
 		perror("accept");
 		return;
-		//exit(1);
 	}
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 	client.fd = client_fd;
@@ -125,6 +117,7 @@ void server::get_data_from_client(int i)
 	total_ret = 0;
 	char buf[BUF_SIZE];
 	std::string temp;
+
 	int ret = recv(poll_set[i].fd, buf, BUF_SIZE, 0);
 	total_ret += ret;
 	get_content_length(buf);
@@ -141,29 +134,23 @@ void server::get_data_from_client(int i)
 			buffer.insert(buffer.end(), buf, buf + ret);
 		}
 	}
+
 	if(ret < 0){ return; }
 	else if(ret == 0){ clear_fd(i); }
 	else
 	{
 		std::string data(buffer.begin(), buffer.end());
-		// std::cout << "RET = " << total_ret << "\n";
-		// std::cout << "DATA = \n" << data << "\n" ;
 		std::string path = data.substr(data.find("/"), data.find("HTTP") - data.find("/") - 1);
 		for (unsigned int i = 0; i < contents.size(); i++)
 		{
 			if (path.find(contents[i]) != std::string::npos)
 			{
-				// std::cout << content_typer(contents,i) << std::endl;
 				std::string pathed = trim(this->serveInfo.locations["/"].root +  path);
 				std::ifstream file;
 
 				file.open(pathed.c_str());
 				if (!file.is_open())
-				{
-
 					std::cout << "file not found" << std::endl;
-
-				}
 				else
 				{
 					file.close();
@@ -174,8 +161,7 @@ void server::get_data_from_client(int i)
 			}
 		}
 
-
-		std::pair<std::string, std::string> page = find_page(*this, data);
+		std::pair<std::string, std::string> page = find_page(data);
 		if (data.find("DELETE") != std::string::npos)
 		{
 			std::string upload_path;
@@ -189,44 +175,32 @@ void server::get_data_from_client(int i)
 			delete_upload(upload_path);
 		}
 		else if (page.first == "POST" && page.second == "/upload")
-		{
 			upload(*this, page, data, content_length);
-		}
 		else if (page.second.find("cgi-bin") != std::string::npos)
 		{
 			std::cout << "DATA = \n" << data << "\n END OF DATA\n" ;
 			CGI cgi(serveInfo, page, data);
-			// std::cout << "buffer->>>>>>>>>>>>>>"  <<  cgi.get_buffer();
 			if (strlen(cgi.get_buffer().c_str()) != 0)
 				resp  = response(cgi.get_buffer());
 			else
-			{
-				/// correct error page here!!
 				resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
-			}
-			
 		}
 		else
-		{
 			resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
-		//poll_set[i].revents = 0 | POLLOUT | POLLHUP | POLLERR;
-	}
 }
 
 }
 
 void server::get_data_from_server(int i)
 {
-	std::string http_response =  
-	
-	resp.build_response(serveInfo.locations);
+	std::string http_response = resp.build_response(serveInfo.locations);
 
 	int ret = send(poll_set[i].fd, http_response.c_str(), http_response.length(), 0);
 
-	if (ret < 0) { return; }
+	if (ret < 0) { return ; }
 	else { clear_fd(i); }
 
-	std::cout << "closed" << std::endl;
+	// std::cout << "closed" << std::endl;
 }
 
 void server::run()
@@ -247,9 +221,8 @@ void server::run()
 				}
 			}
 		}
+
 		if (poll_set[i].revents & POLLOUT)
-		{
 			get_data_from_server(i);
-		}
 	}
 }

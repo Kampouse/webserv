@@ -1,10 +1,13 @@
-#ifndef RESPONSE_HPP
-#define RESPONSE_HPP
+#pragma once
 
 #include <iostream>
-#include <string>
 #include <cstring>
+#include <sstream>
+#include <dirent.h>
+#include <time.h>
+
 #include "config_structs.hpp"
+
 #if OS_LINUX
 #include "wait.h"
 #endif
@@ -12,12 +15,12 @@
 class response {
 	public:
 		response();
+		~response();
 		response(std::string response_string);
 		response(location_info serv, std::map<int,std::string> error_page,std::string &path);
-		response (std::string &path,std::string &type);
-		std::string  build_response(std::map<std::string,location_info> &lst_info );
-	void	set_response(int value); 
-	//	std::string build_response(void);
+		response(std::string &path,std::string &type);
+		std::string build_response(std::map<std::string,location_info> &lst_info );
+		void set_response(int value); 
 		void set_status_code(int code);
 
 	private: 
@@ -29,5 +32,3 @@ class response {
 		std::string status;
 		int status_code;
 };
-
-#endif
