@@ -91,6 +91,7 @@ struct location_info {
 			contents.push_back("jpeg");
 			contents.push_back("gif");
 			contents.push_back("ico");
+			contents.push_back("svg");
 			
 			if (std::find(contents.begin(), contents.end(), val) != contents.end())
 				return "image/" + val;
