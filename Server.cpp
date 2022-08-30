@@ -2,6 +2,7 @@
 
 server::server(server_info servInfo)
 {
+	bzero(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(servInfo.port);
 	server_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
@@ -178,7 +179,6 @@ void server::get_data_from_client(int i)
 			upload(*this, page, data, content_length);
 		else if (page.second.find("cgi-bin") != std::string::npos)
 		{
-			std::cout << "DATA = \n" << data << "\n END OF DATA\n" ;
 			CGI cgi(serveInfo, page, data);
 			if (strlen(cgi.get_buffer().c_str()) != 0)
 				resp  = response(cgi.get_buffer());

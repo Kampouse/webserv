@@ -17,6 +17,7 @@ void close_serv(int sig)
 	(void)sig;
 	std::cout << "\n\n";
 	throw std::runtime_error("Server terminated!");
+	exit (1);
 }
 
 int main(void)
@@ -41,5 +42,6 @@ int main(void)
 			it->run();
 		}
 	}
+
 	return (0);
 }

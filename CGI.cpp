@@ -97,6 +97,8 @@ void CGI::setEnvVars()
 	envp[15] = NULL;
 	envp[16] = NULL;
 
+	env_size = vars.size();
+
 	size_t i = 0;
 	size_t len;
 	for ( std::vector<std::string>::iterator it = vars.begin(); it != vars.end(); it++, i++) {
@@ -151,7 +153,7 @@ void CGI::execCGI()
 		delete[] args[1];
 		delete[] args;
 
-		for (size_t i = 0; i < 14; i++)
+		for (size_t i = 0; i < env_size; i++)
 			delete[] envp[i];
 		delete[] envp;
 	}

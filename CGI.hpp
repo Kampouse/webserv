@@ -19,6 +19,7 @@ class CGI {
 		std::string data;
 		std::string body;
 		char buffer[100000];
+		size_t env_size;
 		std::string getExecPath();
 
 		// Convert Numerical type to String
