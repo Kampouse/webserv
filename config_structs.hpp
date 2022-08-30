@@ -28,6 +28,8 @@ struct location_info {
 		is_dir = false;
 	}
 
+	~location_info() {}
+
 	location_info(std::string rooted) {
 		root = rooted;
 		autoindex = false;
@@ -35,6 +37,20 @@ struct location_info {
 		redirect_to = "";
 		redirect_code = 0;
 		is_dir = false;
+	}
+
+	location_info & operator=(const location_info & rhs)
+	{
+		redirect_code = rhs.redirect_code;
+		redirect_to = rhs.redirect_to;
+		root = rhs.root;
+		cgi = rhs.cgi;
+		allowed_requests = rhs.allowed_requests;
+		index = rhs.index;
+		upload_dir = rhs.upload_dir;
+		autoindex = rhs.autoindex;
+		is_dir = rhs.is_dir;
+		return *this;
 	}
 
 	std::string find_error_page(std::string path) const
@@ -136,6 +152,20 @@ struct server_info {
 		client_max_body_size = 0;
 		port = 0;
 		server_names = "localhost";
+	}
+
+	~server_info() {}
+
+	server_info & operator=(const server_info & rhs)
+	{
+		host = rhs.host;
+		port = rhs.port;
+		server_names = rhs.server_names;
+		error_pages = rhs.error_pages;
+		client_max_body_size = rhs.client_max_body_size;
+		address = rhs.address;
+		locations = rhs.locations;
+		return *this;
 	}
 
 };

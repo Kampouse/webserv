@@ -26,12 +26,13 @@ class response;
 class server {
 	public:
 		server_info serveInfo;
+		std::vector<pollfd> poll_set;
 		response resp;
 	
-		server() {};
+		server();
 		server(struct server_info serv);
 		server(std::string path);
-		~server() {};
+		~server();
 	
 		void add_client(void);
 		void clear_fd(int i);
@@ -41,7 +42,6 @@ class server {
 		unsigned int getTotalRet() { return total_ret; }
 
 	private :
-		std::vector<pollfd> poll_set;
 		struct sockaddr_in server_addr;
 		int server_fd;
 		std::vector<char> buffer;

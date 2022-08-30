@@ -3,6 +3,18 @@
 response::response() : path(""){}
 response::~response() {}
 
+response & response::operator=(const response & rhs)
+{
+	local_info = rhs.local_info;
+	error_page = rhs.error_page;
+	path = rhs.path;
+	type = rhs.type;
+	content = rhs.content;
+	status = rhs.status;
+	status_code = rhs.status_code;
+	return *this;
+}
+
 response::response(std::string reponse_string) : content(reponse_string), status_code(200){}
 
 response::response(std::string &path,std::string &type):path(path),type(type)
@@ -79,21 +91,20 @@ std::map<std::string,location_info >&locations)
 				}
 				else if (dp->d_type == DT_REG)
 				{
-
 					std::string s = path; 
-					 s =  s.substr( s.find("/")); 
-					 files.push_back (s);
+					s =  s.substr( s.find("/")); 
+					files.push_back (s);
 					locations[s].autoindex = false;
 					locations[s].root = s;
 					locations[s].index = s;
 				}
-       }
+		}
 	
 	}
 	closedir(dir);
 
 	return files;
-    }
+}
 
 
 std::string readfile(std::string path)
@@ -108,27 +119,27 @@ std::string readfile(std::string path)
 
 std::string list_directory(std::string&content_type,std::string&content,int&content_length,location_info local_info, std::map<std::string,location_info> &lst_info  )
 {
-			content_type = "text/html";
-			content = "<!DOCTYPE html><html><head><title>Index of " + local_info.root + 
-			"</title></head><body><h1>Index of " + local_info.root + 
-			"</h1><table><tr><th>Name</th><th>Last modified</th><th>Size</th></tr>";
-				std::vector<std::string> lst;
-			 std::vector<std::string> files =	listFilesRecursively(local_info.root.c_str(),lst,lst_info);
-			for (std::vector<std::string>::iterator it = lst.begin(); it != lst.end(); ++it)
-			{
-				std::string s = *it; 
-				content += "<tr><td><a href=\"" +  s + "\">" + s  + "</a></td><td>" ;
-			}
-			if(files.size() != 0)
-			{
-						for (size_t val = 0; val != files.size(); ++val )
-						{
-							content += "<tr><td><a href=\"" +  files[val]+ "\">" + files[val] + "</a></td><td>" ;
-						}
-			}
+	content_type = "text/html";
+	content = "<!DOCTYPE html><html><head><title>Index of " + local_info.root + 
+	"</title></head><body><h1>Index of " + local_info.root + 
+	"</h1><table><tr><th>Name</th><th>Last modified</th><th>Size</th></tr>";
+	std::vector<std::string> lst;
+	std::vector<std::string> files = listFilesRecursively(local_info.root.c_str(),lst,lst_info);
+	for (std::vector<std::string>::iterator it = lst.begin(); it != lst.end(); ++it)
+	{
+		std::string s = *it; 
+		content += "<tr><td><a href=\"" +  s + "\">" + s  + "</a></td><td>" ;
+	}
+	if(files.size() != 0)
+	{
+		for (size_t val = 0; val != files.size(); ++val )
+		{
+			content += "<tr><td><a href=\"" +  files[val]+ "\">" + files[val] + "</a></td><td>" ;
+		}
+	}
 		
-			content += "</table></body></html>";
-return content;
+	content += "</table></body></html>";
+	return content;
 }
 
 
@@ -203,12 +214,12 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	if (local_info.redirect_to != "")
 		response += "Location: " + local_info.redirect_to + "\r\n";
 	if (str.length() !=0)
-	 {
+	{
 		 std::stringstream ssd;
 		 ssd << str.length();
 		 content_length_str = ssd.str();
 		 response += "Content-Length: " + content_length_str + "\r\n";
-	 }
+	}
 	else
 		response += "Content-Length: " + content_length_str + "\r\n";
 	response += "\r\n";
