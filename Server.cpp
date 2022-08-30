@@ -1,13 +1,7 @@
 #include "Server.hpp"
 
 server::server() {}
-
-server::~server()
-{
-	// std::cout << "Destructor called\n";
-	// while (poll_set.size())
-	// 	clear_fd(0);
-}
+server::~server() {}
 
 server::server(server_info servInfo)
 {
