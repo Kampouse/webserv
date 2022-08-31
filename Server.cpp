@@ -154,7 +154,7 @@ void server::get_data_from_client(int i)
 
 				file.open(pathed.c_str());
 				if (!file.is_open())
-					std::cout << "file not found" << std::endl;
+					continue ;
 				else
 				{
 					file.close();

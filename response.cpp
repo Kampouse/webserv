@@ -1,4 +1,6 @@
 #include "response.hpp"
+#include "fcntl.h" 
+#include <sys/stat.h>
 
 response::response() : path(""){}
 response::~response() {}
@@ -96,7 +98,7 @@ std::map<std::string,location_info >&locations)
 					files.push_back (s);
 					locations[s].autoindex = false;
 					locations[s].root = s;
-					locations[s].index = s;
+					locations[s].index = basePath;
 				}
 		}
 	
@@ -105,7 +107,6 @@ std::map<std::string,location_info >&locations)
 
 	return files;
 }
-
 
 std::string readfile(std::string path)
 {
@@ -122,7 +123,13 @@ std::string list_directory(std::string&content_type,std::string&content,int&cont
 	content_type = "text/html";
 	content = "<!DOCTYPE html><html><head><title>Index of " + local_info.root + 
 	"</title></head><body><h1>Index of " + local_info.root + 
-	"</h1><table><tr><th>Name</th><th>Last modified</th><th>Size</th></tr>";
+	"</h1><table><tr><th>Name</th><th>Last modified</th></tr>";
+	//get last modified time of the directory
+	struct stat st;
+	std::string last_modified = ctime(&st.st_mtime);
+	last_modified = last_modified.substr(0, last_modified.length() - 1);
+	lst_info[local_info.root.substr(1,local_info.root.length())].root = local_info.root;
+	lst_info[local_info.root.substr(1,local_info.root.length())].autoindex = true; 
 	std::vector<std::string> lst;
 	std::vector<std::string> files = listFilesRecursively(local_info.root.c_str(),lst,lst_info);
 	for (std::vector<std::string>::iterator it = lst.begin(); it != lst.end(); ++it)
@@ -134,14 +141,17 @@ std::string list_directory(std::string&content_type,std::string&content,int&cont
 	{
 		for (size_t val = 0; val != files.size(); ++val )
 		{
-			content += "<tr><td><a href=\"" +  files[val]+ "\">" + files[val] + "</a></td><td>" ;
+			stat(files[val].c_str(), &st);
+			 last_modified = ctime(&st.st_mtime);
+			 last_modified = last_modified.substr(0, last_modified.length() - 8);
+			content += "<tr><td><a href=\"" +  files[val] + "\">" +  files[val].substr(files[val].find_last_of("/"))  + "</a></td><td>" + last_modified + "</td><td>";
 		}
+		content += "<tr><td><a href=\"/" + lst_info[files[0]].index + "\">.</a></td><td></td></tr>";
+		content += "<tr><td><a href=\"/" + lst_info[files[0]].index.substr(0, lst_info[files[0]].index.find_last_of("/"))    + "\">..</a></td><td></td></tr>";
 	}
-		
 	content += "</table></body></html>";
 	return content;
 }
-
 
 std::string  response::build_response(std::map<std::string,location_info> &lst_info )
 {
