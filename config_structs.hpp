@@ -16,6 +16,7 @@ struct location_info {
 	std::vector<std::string>			allowed_requests;
 	std::string							index;
 	std::string							upload_dir;
+	unsigned int						client_max_body_size;
 	bool								autoindex;
 	bool								is_dir;
 
@@ -24,6 +25,7 @@ struct location_info {
 		upload_dir = "";
 		redirect_to = "";
 		redirect_code = 0;
+		client_max_body_size = 0;
 		autoindex = false;
 		is_dir = false;
 	}
