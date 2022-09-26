@@ -17,6 +17,7 @@ struct location_info {
 	std::string							index;
 	std::string							upload_dir;
 	bool								autoindex;
+	int									len;
 	bool								is_dir;
 
 	location_info() {
@@ -24,6 +25,7 @@ struct location_info {
 		upload_dir = "";
 		redirect_to = "";
 		redirect_code = 0;
+		len = 0;
 		autoindex = false;
 		is_dir = false;
 	}

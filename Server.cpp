@@ -8,6 +8,7 @@ server::server(server_info servInfo)
 	bzero(&server_addr, sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(servInfo.port);
+
 	server_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
 
 	serveInfo = servInfo;
@@ -20,7 +21,7 @@ server::server(server_info servInfo)
 	if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0)
 		return ;
 
-	listen(server_fd, 100);
+	listen(server_fd, 255);
 
 	pollfd serv;
 	serv.fd = server_fd;
@@ -189,7 +190,10 @@ void server::get_data_from_client(int i)
 				resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
 		}
 		else
+		{
+			serveInfo.locations[page.second].len  = content_length;
 			resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
+		}
 }
 
 }

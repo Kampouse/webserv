@@ -39,11 +39,20 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 	this->type = "";
 	this->local_info = local_info;
 	this->path = path;
+	
 
-	if(local_info.redirect_to != "")
+	if(local_info.len == 0  && path.find("POST") != std::string::npos)
+	{
+		this->status = "411 Length Required"; 
+		this->status_code = 411;
+
+	}
+
+	else if(local_info.redirect_to != "")
 	{
 		this->status = "301 Moved Permanently"; 
 		this->status_code = 301;
+
 	}
 	else if (local_info.root == "")
 	{
@@ -265,6 +274,7 @@ void response::set_response(int status_code)
 		this->status_code = status_code;
 		status = "500 Internal Server Error";
 	}
+
 	else
 	{
 		this->status_code = status_code;
