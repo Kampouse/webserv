@@ -22,16 +22,16 @@ void close_serv(int sig)
 	throw std::runtime_error("Server terminated!");
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
+	std::string  config;
 	signal(SIGQUIT, close_serv);
 	signal(SIGINT, close_serv);
-
+	 config = (argc ==  2 ?  argv[1] :"default.conf");
 	try {
-		std::cout << "server as started! " << std::endl;
-		parser parser("default.conf");
+		parser parser(config);
 		std::vector<server_info> servers_info = parser.getServers();
-		
+		std::cout << "server as started! " << std::endl;
 		for (std::vector<server_info>::iterator it = servers_info.begin(); it != servers_info.end(); ++it)
 		{
 			std::cout << "server_info: " << it->port << std::endl;
