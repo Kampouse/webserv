@@ -233,6 +233,20 @@ void parser::get_server_fields(void)
 	}
 }
 
+void parser::set_max_body_size()
+{
+	std::vector<server_info>::iterator it = servers.begin();
+	for (; it != servers.end(); it++)
+	{
+		std::map<std::string, location_info>::iterator it_loc = it->locations.begin();
+		for (; it_loc != it->locations.end(); it_loc++)
+		{
+			if (it_loc->second.client_max_body_size == 0 && it->client_max_body_size != 0)
+				it_loc->second.client_max_body_size = it->client_max_body_size;
+		}
+	}
+}
+
 void parser::parsefile(std::string path)
 {
 	this->config_file_fd.open(path.c_str());
@@ -242,6 +256,7 @@ void parser::parsefile(std::string path)
 	this->config_file_fd.close();
 	check_errors();
 	get_server_fields();
+	set_max_body_size();
 }
 
 std::vector<server_info>&parser::getServers() { return (servers); }

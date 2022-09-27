@@ -40,31 +40,30 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 	this->local_info = local_info;
 	this->path = path;
 	
-
-	if(local_info.len == 0  && path.find("POST") != std::string::npos)
+	if(local_info.client_max_body_size != 0 && local_info.len > local_info.client_max_body_size)
+	{
+		this->status = "413 Payload Too Large"; 
+		this->status_code = 413;
+	}
+	else if(local_info.len == 0  && path.find("POST") != std::string::npos)
 	{
 		this->status = "411 Length Required"; 
 		this->status_code = 411;
-
 	}
-
 	else if(local_info.redirect_to != "")
 	{
 		this->status = "301 Moved Permanently"; 
 		this->status_code = 301;
-
 	}
 	else if (local_info.root == "")
 	{
 		this->status = "404 Not Found";
 		this->status_code = 404;
-
 	}
 	else
 	{
 		this->status = "200 OK";
 		this->status_code = 200;
-
 	}
 }
 
@@ -186,7 +185,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	}
 	else if(status_code != 200)
 	{
-		content  = 	local_info.find_error_page( error_page[status_code]);
+		content  = 	local_info.find_error_page(error_page[status_code]);
 		content_length = content.length();
 		content_type = "text/html";
 	}
@@ -274,7 +273,6 @@ void response::set_response(int status_code)
 		this->status_code = status_code;
 		status = "500 Internal Server Error";
 	}
-
 	else
 	{
 		this->status_code = status_code;

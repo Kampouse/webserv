@@ -26,6 +26,7 @@ class parser
 		void check_errors(void);
 		void get_server_fields(void);
 		void manage_locations(std::vector<std::string>::iterator it);
+		void set_max_body_size(void);
 
 	public:
 		parser();

@@ -26,6 +26,7 @@ struct location_info {
 		upload_dir = "";
 		redirect_to = "";
 		redirect_code = 0;
+		client_max_body_size = 0;
 	}
 	~location_info() {}
 
@@ -35,6 +36,7 @@ struct location_info {
 		upload_dir = "";
 		redirect_to = "";
 		redirect_code = 0;
+		client_max_body_size = 0;
 		is_dir = false;
 	}
 

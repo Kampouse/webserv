@@ -8,6 +8,8 @@ upload::upload(server &serv, std::pair<std::string, std::string> page, std::stri
 {
 	// content_length = 100000000;
 	struct stat s;
+	std::cout << content_length << "\n";
+	std::cout << serverInfo.client_max_body_size << "\n";
 	if (content_length > serverInfo.client_max_body_size)
 	{
 		serv.resp.set_status_code(413);
