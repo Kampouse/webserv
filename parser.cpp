@@ -144,6 +144,17 @@ void parser::manage_locations(std::vector<std::string>::iterator it)
 				}
 			}
 		}
+		else if (field == "client_max_body_size") {
+			if (!std::isdigit(data[0]))
+				throw Exceptions::InvalidFieldError("client_max_body_size");
+			servers.back().locations[location].client_max_body_size = atoi(data.c_str());
+			servers.back().locations[location].client_max_body_size *= 1024 * 1024;
+			pos = 0;
+			while (std::isdigit(data[pos]))
+				pos++;
+			if (data.length() != pos + 1 || (data[pos] != 'm' && data[pos] != 'M'))
+				throw Exceptions::InvalidFieldError("client_max_body_size");
+		}
 		else if (field == "return") {
 
 		unsigned int	field = data.find_first_of(WHITESPACES);
