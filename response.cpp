@@ -36,6 +36,8 @@ response::response(std::string &path,std::string &type):path(path),type(type)
 response::response(location_info local_info, std::map<int, std::string> error_page, std::string &path)
 	: error_page(error_page), path(path)
 {
+	std::cout << path << std::endl;
+
 	this->type = "";
 	this->local_info = local_info;
 	this->path = path;
@@ -171,6 +173,8 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	std::stringstream ss;
 	std::string content_type ;
 
+
+
 	if (status_code == 200 && this->content == "/upload")
 	{
 		content = readfile("./resources/success/upload_success.html");
@@ -214,7 +218,21 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 		content_length = content.length();
 		content_type = "text/html";
 	}
-
+	for ( std::vector<std::string>::iterator it = local_info.allowed_requests.begin(); it != local_info.allowed_requests.end(); it++)
+	 {
+		 if (path.find(*it) != std::string::npos)
+		 {
+			 status_code = 200;
+			 status = "200 OK";
+			 break ;
+		 }
+		 else
+		 {
+			 status_code = 405;
+			 status = "405 Method Not Allowed";
+			content = readfile("./resources/error/error403.html");
+		 }
+	 }
 	std::string str_path = "." + local_info.root;
 	std::string str;
 	if(local_info.index != "" && (str = readfile(str_path)).length() != 0)
