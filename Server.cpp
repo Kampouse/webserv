@@ -140,7 +140,12 @@ void server::get_data_from_client(int i)
 		}
 	}
 
-	if(ret < 0){ return; }
+	if(ret < 0){ 
+		std::cout << "recv error" << std::endl;
+		clear_fd(i);
+		return; 
+
+	}
 	else if(ret == 0){ clear_fd(i); }
 	else
 	{
@@ -204,7 +209,12 @@ void server::get_data_from_server(int i)
 
 	int ret = send(poll_set[i].fd, http_response.c_str(), http_response.length(), 0);
 
-	if (ret < 0) { return ; }
+	if (ret < 0) { 
+		std::cout << "Error sending response\n" << std::endl;
+		clear_fd(i);
+	return ; 
+
+	}
 	else { clear_fd(i); }
 
 	// std::cout << "closed" << std::endl;

@@ -183,14 +183,13 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 		 {
 			 status_code = 405;
 			 status = "405 Method Not Allowed";
-			content = readfile("./resources/error/error403.html");
+			content = readfile("./resources/error/error405.html");
 		 }
 	 }
 	if (status_code == 405)
 	{
 			 content_type  = "text/html";
 			 content_length = content.length();
-
 	}
 	else if (status_code == 200 && this->content == "/upload")
 	{
