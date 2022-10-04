@@ -108,7 +108,11 @@ void parser::manage_locations(std::vector<std::string>::iterator it)
 	{
 		pos = (*it).find_first_of(WHITESPACES);
 		field = (*it).substr(0, pos);
-		data = (*it).substr(pos, (*it).find_first_of(';') - pos);
+		if (field[field.length() - 1] == ';')
+			field = field.substr(0, field.length() - 1);
+		data = "";
+		if (pos != std::string::npos)
+			data = (*it).substr(pos, (*it).find_first_of(';') - pos);
 		data = trim(data);
 
 		if (field == "root") {
@@ -195,7 +199,11 @@ void parser::get_server_fields(void)
 		else {
 			pos = (*it).find_first_of(WHITESPACES);
 			field = (*it).substr(0, pos);
-			data = (*it).substr(pos, (*it).find_first_of(';') - pos);
+			if (field[field.length() - 1] == ';')
+				field = field.substr(0, field.length() - 1);
+			data = "";
+			if (pos != std::string::npos)
+				data = (*it).substr(pos, (*it).find_first_of(';') - pos);
 			data = trim(data);
 
 			if (field == "listen") {
