@@ -188,29 +188,21 @@ void server::get_data_from_client(int i)
 			upload(*this, page, data, content_length);
 		else if (page.second.find("cgi-bin") != std::string::npos)
 		{
-
-		for ( std::vector<std::string>::iterator it = serveInfo.locations[page.second].allowed_requests.begin(); it != serveInfo.locations[page.second].allowed_requests.end(); it++)
-		{
-			if (page.first == *it)
-			{
-				CGI cgi(serveInfo, page, data);
-				if (strlen(cgi.get_buffer().c_str()) != 0)
-				{
-					resp  = response(cgi.get_buffer());
-					return;
-				}
-				else
-				{
-					resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
-					return;
-				}
-			}
+			CGI cgi(serveInfo, page, data);
+			if (strlen(cgi.get_buffer().c_str()) != 0)
+				resp  = response(cgi.get_buffer());
+			else
+				resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
 		}
+		else
+		{
 			serveInfo.locations[page.second].len  = content_length;
 			resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
 		}
-	}
 }
+
+}
+
 void server::get_data_from_server(int i)
 {
 	std::string http_response = resp.build_response(serveInfo.locations);
