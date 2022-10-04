@@ -112,7 +112,7 @@ void server::add_client (void)
 	}
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 	client.fd = client_fd;
-	client.events = POLLIN | POLLHUP | POLLERR;
+	client.events = POLLIN | POLLHUP | POLLERR | POLLOUT;
 	client.revents = 0;
 	poll_set.push_back(client);
 }
@@ -206,18 +206,14 @@ void server::get_data_from_client(int i)
 void server::get_data_from_server(int i)
 {
 	std::string http_response = resp.build_response(serveInfo.locations);
-
 	int ret = send(poll_set[i].fd, http_response.c_str(), http_response.length(), 0);
-
 	if (ret < 0) { 
 		std::cout << "Error sending response\n" << std::endl;
 		clear_fd(i);
-	return ; 
-
 	}
-	else { clear_fd(i); }
-
-	// std::cout << "closed" << std::endl;
+	else { 
+		clear_fd(i); 
+	}
 }
 
 void server::run()
@@ -229,17 +225,15 @@ void server::run()
 		{
 			if(poll_set[i].fd == server_fd)
 				add_client();
-			else
+			else if(poll_set[i].fd != server_fd)
 			{
 				get_data_from_client(i);
-				if(poll_set[i].revents & POLLIN)
-				{
-					get_data_from_server(i);
-				}
 			}
 		}
-
 		if (poll_set[i].revents & POLLOUT)
+		{
 			get_data_from_server(i);
+		}
+
 	}
 }
