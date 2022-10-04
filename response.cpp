@@ -172,6 +172,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	std::string content_type ;
 
 	for ( std::vector<std::string>::iterator it = local_info.allowed_requests.begin(); it != local_info.allowed_requests.end(); it++)
+
 	 {
 		 if (path.find(*it) != std::string::npos)
 		 {
@@ -181,8 +182,10 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 		 }
 		 else
 		 {
+		
 			 status_code = 405;
 			 status = "405 Method Not Allowed";
+			 
 			content = readfile("./resources/error/error405.html");
 		 }
 	 }
