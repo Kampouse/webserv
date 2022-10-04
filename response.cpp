@@ -40,6 +40,50 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 	this->local_info = local_info;
 	this->path = path;
 	
+	
+	std::string temp = path.substr(0, path.find(" "));
+// a for loop to find if the request is allowed or not
+	int out;
+		this->status = "200 OK";
+		this->status_code = 200;
+	for (size_t i = 0; i < local_info.allowed_requests.size(); i++)
+	{
+		if (local_info.allowed_requests[i] == temp)
+		{
+			std::cout << "request is allowed" << std::endl;
+			status_code = 200;
+			status = "200 OK";
+
+			return;
+		}
+	
+		if(local_info.client_max_body_size != 0 && local_info.len > local_info.client_max_body_size)
+		{
+			this->status = "413 Payload Too Large"; 
+			this->status_code = 413;
+		}
+		else if(local_info.len == 0  && path.find("POST") != std::string::npos)
+		{
+			this->status = "411 Length Required"; 
+			this->status_code = 411;
+		}
+		else if(local_info.redirect_to != "")
+		{
+			this->status = "301 Moved Permanently"; 
+			this->status_code = 301;
+		}
+		else if (local_info.root == "")
+		{
+			this->status = "404 Not Found";
+			this->status_code = 404;
+		}
+		else
+		{
+			this->status = "200 OK";
+			this->status_code = 200;
+		}
+		out = i;
+	}
 	if(local_info.client_max_body_size != 0 && local_info.len > local_info.client_max_body_size)
 	{
 		this->status = "413 Payload Too Large"; 
@@ -62,8 +106,8 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 	}
 	else
 	{
-		this->status = "200 OK";
-		this->status_code = 200;
+		this->status = "405 Method Not Allowed";
+		this->status_code = 405;
 	}
 }
 
@@ -171,27 +215,12 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	std::stringstream ss;
 	std::string content_type ;
 
-	for ( std::vector<std::string>::iterator it = local_info.allowed_requests.begin(); it != local_info.allowed_requests.end(); it++)
 
-	 {
-		 if (path.find(*it) != std::string::npos)
-		 {
-			 status_code = 200;
-			 status = "200 OK";
-			 break ;
-		 }
-		 else
-		 {
-		
-			 status_code = 405;
-			 status = "405 Method Not Allowed";
-			 
-			content = readfile("./resources/error/error405.html");
-		 }
-	 }
+	
 	if (status_code == 405)
 	{
 			 content_type  = "text/html";
+			content =  readfile("./resources/error/error405.html");
 			 content_length = content.length();
 	}
 	else if (status_code == 200 && this->content == "/upload")
@@ -233,6 +262,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	}
 	else
 	{
+		std::cout << status_code  << std::endl;
 		content = local_info.find_error_page( error_page[status_code]);
 		content_length = content.length();
 		content_type = "text/html";

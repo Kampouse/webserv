@@ -5,8 +5,18 @@
 #include <vector>
 #include <netinet/in.h>
 #include <fstream> 
+#include <iostream> 
 
 #define WHITESPACES "\t\n\v\f\r "
+
+
+
+
+
+
+
+
+
 
 struct location_info {
 	std::string							redirect_to;
@@ -53,6 +63,18 @@ struct location_info {
 		is_dir = rhs.is_dir;
 		return *this;
 	}
+
+	int find_allow_request(std::string request) {
+		std::cout << "allowed_requests.size() = " << allowed_requests.size() << std::endl;
+
+		for (size_t i = 0; i < allowed_requests.size(); i++) {
+			if (allowed_requests[i] == request)
+				return (true);
+		}
+		return (false);
+	}
+
+
 
 	std::string find_error_page(std::string path) const
 	{

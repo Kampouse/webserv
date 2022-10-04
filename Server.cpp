@@ -3,6 +3,7 @@
 server::server() {}
 server::~server() {}
 
+
 server::server(server_info servInfo)
 {
 	bzero(&server_addr, sizeof(server_addr));
@@ -170,7 +171,6 @@ void server::get_data_from_client(int i)
 				}
 			}
 		}
-
 		std::pair<std::string, std::string> page = find_page(data);
 		if (data.find("DELETE") != std::string::npos)
 		{
@@ -185,8 +185,10 @@ void server::get_data_from_client(int i)
 			delete_upload(upload_path);
 		}
 		else if (page.first == "POST" && page.second == "/upload")
-			upload(*this, page, data, content_length);
-		else if (page.second.find("cgi-bin") != std::string::npos)
+		{
+				upload(*this, page, data, content_length);
+		}
+		else if (page.second.find("cgi-bin") != std::string::npos )
 		{
 			CGI cgi(serveInfo, page, data);
 			if (strlen(cgi.get_buffer().c_str()) != 0)
