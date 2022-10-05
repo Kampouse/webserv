@@ -39,52 +39,27 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 	this->type = "";
 	this->local_info = local_info;
 	this->path = path;
-	
-	
+	this->status = "200 OK";
+	this->status_code = 200;
 	std::string temp = path.substr(0, path.find(" "));
-// a for loop to find if the request is allowed or not
-	int out;
-		this->status = "200 OK";
-		this->status_code = 200;
+	bool allowed = true ;
 	for (size_t i = 0; i < local_info.allowed_requests.size(); i++)
 	{
 		if (local_info.allowed_requests[i] == temp)
 		{
-			std::cout << "request is allowed" << std::endl;
-			status_code = 200;
-			status = "200 OK";
-
-			return;
-		}
-	
-		if(local_info.client_max_body_size != 0 && local_info.len > local_info.client_max_body_size)
-		{
-			this->status = "413 Payload Too Large"; 
-			this->status_code = 413;
-		}
-		else if(local_info.len == 0  && path.find("POST") != std::string::npos)
-		{
-			this->status = "411 Length Required"; 
-			this->status_code = 411;
-		}
-		else if(local_info.redirect_to != "")
-		{
-			this->status = "301 Moved Permanently"; 
-			this->status_code = 301;
-		}
-		else if (local_info.root == "")
-		{
-			this->status = "404 Not Found";
-			this->status_code = 404;
+			allowed = true;
+			break;
 		}
 		else
-		{
-			this->status = "200 OK";
-			this->status_code = 200;
-		}
-		out = i;
+			allowed = false;
 	}
-	if(local_info.client_max_body_size != 0 && local_info.len > local_info.client_max_body_size)
+	if (allowed ==  false)
+	{
+		this->status = "405 Method Not Allowed";
+		this->status_code = 405;
+		return;
+	}
+	if (local_info.client_max_body_size != 0 && (unsigned int) local_info.len > local_info.client_max_body_size)
 	{
 		this->status = "413 Payload Too Large"; 
 		this->status_code = 413;
@@ -106,8 +81,8 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 	}
 	else
 	{
-		this->status = "405 Method Not Allowed";
-		this->status_code = 405;
+		this->status = "200 OK";
+		this->status_code = 200;
 	}
 }
 
@@ -120,11 +95,8 @@ std::map<std::string,location_info >&locations)
     struct dirent *dp;
     DIR *dir = opendir(basePath);
 	std::vector<std::string> files;
-    // Unable to open directory stream
     if (!dir)
-	{
         return files;
-	}
 	locations[basePath].autoindex = true;
 	locations[basePath].root  = basePath ;
     while ((dp = readdir(dir)) != NULL)
@@ -172,11 +144,11 @@ std::string readfile(std::string path)
 
 std::string list_directory(std::string&content_type,std::string&content,int&content_length,location_info local_info, std::map<std::string,location_info> &lst_info  )
 {
+	(void)content_length;
 	content_type = "text/html";
 	content = "<!DOCTYPE html><html><head><title>Index of " + local_info.root + 
 	"</title></head><body><h1>Index of " + local_info.root + 
 	"</h1><table><tr><th>Name</th><th>Last modified</th></tr>";
-	//get last modified time of the directory
 	struct stat st;
 	std::string last_modified = ctime(&st.st_mtime);
 	last_modified = last_modified.substr(0, last_modified.length() - 1);
@@ -215,15 +187,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	std::stringstream ss;
 	std::string content_type ;
 
-
-	
-	if (status_code == 405)
-	{
-			 content_type  = "text/html";
-			content =  readfile("./resources/error/error405.html");
-			 content_length = content.length();
-	}
-	else if (status_code == 200 && this->content == "/upload")
+	if (status_code == 200 && this->content == "/upload")
 	{
 		content = readfile("./resources/success/upload_success.html");
 		content_length = content.length();
@@ -295,13 +259,9 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 		response += "Content-Length: " + content_length_str + "\r\n";
 	response += "\r\n";
 	if(str != "")
-	{
 		response += str;
-	}
 	else
-	{
 		response += content;
-	}
 	return response;
 }
 
