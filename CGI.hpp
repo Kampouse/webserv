@@ -13,6 +13,7 @@ class CGI {
 		char ** envp;
 		server_info serverInfo;
 		std::string request;
+		std::vector<std::string>			allowed_requests;
 		std::string path;
 		std::string query;
 		std::string scriptName;
@@ -43,5 +44,6 @@ class CGI {
 		void setEnvVars();
 
 		void execCGI();
+
 		std::string get_buffer() { return buffer; }
 };

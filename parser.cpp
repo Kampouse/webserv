@@ -100,7 +100,7 @@ void parser::manage_locations(std::vector<std::string>::iterator it)
 {
 	size_t pos;
 	std::string data, field, location;
-
+	std::string cgi, root;
 	location = (*it).substr((*it).find('/'), std::string::npos);
 	servers.back().locations.insert(std::pair<std::string, location_info>(location, location_info()));
 	it += 2;
@@ -115,11 +115,14 @@ void parser::manage_locations(std::vector<std::string>::iterator it)
 			servers.back().locations[location].root = data;
 		}
 		else if (field == "cgi_ext") {
-			std::string cgi, root;
 			cgi = data.substr(0, data.find_first_of(WHITESPACES));
 			root = data.substr(cgi.length(), std::string::npos);
 			root = trim(root);
+			std::cout << location;
+
 			servers.back().locations[location].cgi.insert(std::pair<std::string, std::string>(cgi, root));
+			std::string cgied =  servers.back().locations[location].cgi[root];
+			std::cout << cgied << std::endl;
 		}
 		else if (field == "index") {
 			servers.back().locations[location].index = data;

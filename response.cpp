@@ -18,7 +18,6 @@ response & response::operator=(const response & rhs)
 }
 
 response::response(std::string reponse_string) : content(reponse_string), status_code(200){}
-
 response::response(std::string &path,std::string &type):path(path),type(type)
 {
 	if (path == "")
@@ -232,6 +231,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 		content_type = "text/html";
 	}
 
+	std::cout <<  local_info << std::endl;
 	std::string str_path = "." + local_info.root;
 	std::string str;
 	if(local_info.index != "" && (str = readfile(str_path)).length() != 0)

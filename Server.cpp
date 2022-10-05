@@ -125,6 +125,7 @@ void server::get_data_from_client(int i)
 	std::string temp;
 
 	int ret = recv(poll_set[i].fd, buf, BUF_SIZE, 0);
+	std::string pathed;
 	total_ret += ret;
 	get_content_length(buf);
 
@@ -156,7 +157,7 @@ void server::get_data_from_client(int i)
 		{
 			if (path.find(contents[i]) != std::string::npos)
 			{
-				std::string pathed = trim(this->serveInfo.locations["/"].root +  path);
+				pathed = trim(this->serveInfo.locations["/"].root +  path);
 				std::ifstream file;
 
 				file.open(pathed.c_str());
@@ -171,6 +172,7 @@ void server::get_data_from_client(int i)
 				}
 			}
 		}
+		 
 		std::pair<std::string, std::string> page = find_page(data);
 		if (data.find("DELETE") != std::string::npos)
 		{
@@ -188,9 +190,10 @@ void server::get_data_from_client(int i)
 		{
 				upload(*this, page, data, content_length);
 		}
-		else if (page.second.find("cgi-bin") != std::string::npos )
+		else if (page.second.find("cgi-bin") != std::string::npos && 
+		 (this->serveInfo.locations["/"].find_allow_request( page.first)  || this->serveInfo.locations["/"].allowed_requests.size() == 0) )
 		{
-			CGI cgi(serveInfo, page, data);
+				CGI cgi(serveInfo, page, data);
 			if (strlen(cgi.get_buffer().c_str()) != 0)
 				resp  = response(cgi.get_buffer());
 			else
