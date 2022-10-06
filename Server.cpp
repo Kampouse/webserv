@@ -198,15 +198,21 @@ void server::get_data_from_client(int i)
 			if (strlen(cgi.get_buffer().c_str()) != 0)
 				resp  = response(cgi.get_buffer());
 			else
-				resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data,200);
+				resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
 		}
 		else
 		{
+			if(page.second.find("cgi-bin") != std::string::npos && (this->serveInfo.locations["/"].find_allow_request( page.first) == false))
+			{
+				resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
+				resp.set_status_code(405);
+				resp.set_status("405 Method Not Allowed");
+				return;
+			}
 			serveInfo.locations[page.second].len  = content_length;
-			resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data,405);
+			resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
 		}
-}
-
+	}
 }
 
 void server::get_data_from_server(int i)

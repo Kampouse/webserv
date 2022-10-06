@@ -1,7 +1,6 @@
 #include "response.hpp"
 #include "fcntl.h" 
 #include <sys/stat.h>
-
 response::response() : path(""){}
 response::~response() {}
 
@@ -20,6 +19,12 @@ response & response::operator=(const response & rhs)
 response::response(std::string reponse_string) : content(reponse_string), status_code(200){}
 response::response(std::string &path,std::string &type):path(path),type(type)
 {
+	if(path == "rat")
+	{
+		status_code = 405;
+		status = " 405 Method Not Allowed";
+
+	}
 	if (path == "")
 	{
 		status_code = 404;
@@ -32,19 +37,16 @@ response::response(std::string &path,std::string &type):path(path),type(type)
 	}
 }
 
-response::response(location_info local_info, std::map<int, std::string> error_page, std::string &path, int status_code )
-	: error_page(error_page), path(path) 
+response::response(location_info local_info, std::map<int, std::string> error_page, std::string &path)
+	: error_page(error_page), path(path)
 {
-	bool allowed = true ;
 	this->type = "";
 	this->local_info = local_info;
 	this->path = path;
 	this->status = "200 OK";
-	this->status_code = status_code;
-	if(status_code == 405){
-		allowed = false;
-	}
+	this->status_code = 200;
 	std::string temp = path.substr(0, path.find(" "));
+	bool allowed = true ;
 	for (size_t i = 0; i < local_info.allowed_requests.size(); i++)
 	{
 		if (local_info.allowed_requests[i] == temp)
