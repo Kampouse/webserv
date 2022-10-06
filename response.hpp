@@ -17,7 +17,7 @@ class response {
 		response();
 		~response();
 		response(std::string response_string);
-		response(location_info serv, std::map<int,std::string> error_page,std::string &path);
+		response(location_info serv, std::map<int,std::string> error_page,std::string &path,int status_code );
 		response(std::string &path,std::string &type);
 		response & operator=(const response & rhs);
 		std::string build_response(std::map<std::string,location_info> &lst_info );
