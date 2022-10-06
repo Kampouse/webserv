@@ -18,7 +18,6 @@ response & response::operator=(const response & rhs)
 }
 
 response::response(std::string reponse_string) : content(reponse_string), status_code(200){}
-
 response::response(std::string &path,std::string &type):path(path),type(type)
 {
 	if (path == "")
@@ -39,8 +38,27 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 	this->type = "";
 	this->local_info = local_info;
 	this->path = path;
-	
-	if(local_info.client_max_body_size != 0 && local_info.len > local_info.client_max_body_size)
+	this->status = "200 OK";
+	this->status_code = 200;
+	std::string temp = path.substr(0, path.find(" "));
+	bool allowed = true ;
+	for (size_t i = 0; i < local_info.allowed_requests.size(); i++)
+	{
+		if (local_info.allowed_requests[i] == temp)
+		{
+			allowed = true;
+			break;
+		}
+		else
+			allowed = false;
+	}
+	if (allowed ==  false)
+	{
+		this->status = "405 Method Not Allowed";
+		this->status_code = 405;
+		return;
+	}
+	if (local_info.client_max_body_size != 0 && (unsigned int) local_info.len > local_info.client_max_body_size)
 	{
 		this->status = "413 Payload Too Large"; 
 		this->status_code = 413;
@@ -76,11 +94,8 @@ std::map<std::string,location_info >&locations)
     struct dirent *dp;
     DIR *dir = opendir(basePath);
 	std::vector<std::string> files;
-    // Unable to open directory stream
     if (!dir)
-	{
         return files;
-	}
 	locations[basePath].autoindex = true;
 	locations[basePath].root  = basePath ;
     while ((dp = readdir(dir)) != NULL)
@@ -128,11 +143,11 @@ std::string readfile(std::string path)
 
 std::string list_directory(std::string&content_type,std::string&content,int&content_length,location_info local_info, std::map<std::string,location_info> &lst_info  )
 {
+	(void)content_length;
 	content_type = "text/html";
 	content = "<!DOCTYPE html><html><head><title>Index of " + local_info.root + 
 	"</title></head><body><h1>Index of " + local_info.root + 
 	"</h1><table><tr><th>Name</th><th>Last modified</th></tr>";
-	//get last modified time of the directory
 	struct stat st;
 	std::string last_modified = ctime(&st.st_mtime);
 	last_modified = last_modified.substr(0, last_modified.length() - 1);
@@ -171,27 +186,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	std::stringstream ss;
 	std::string content_type ;
 
-	for ( std::vector<std::string>::iterator it = local_info.allowed_requests.begin(); it != local_info.allowed_requests.end(); it++)
-	 {
-		 if (path.find(*it) != std::string::npos)
-		 {
-			 status_code = 200;
-			 status = "200 OK";
-			 break ;
-		 }
-		 else
-		 {
-			 status_code = 405;
-			 status = "405 Method Not Allowed";
-			content = readfile("./resources/error/error405.html");
-		 }
-	 }
-	if (status_code == 405)
-	{
-			 content_type  = "text/html";
-			 content_length = content.length();
-	}
-	else if (status_code == 200 && this->content == "/upload")
+	if (status_code == 200 && this->content == "/upload")
 	{
 		content = readfile("./resources/success/upload_success.html");
 		content_length = content.length();
@@ -230,11 +225,13 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	}
 	else
 	{
+		std::cout << status_code  << std::endl;
 		content = local_info.find_error_page( error_page[status_code]);
 		content_length = content.length();
 		content_type = "text/html";
 	}
 
+	std::cout <<  local_info << std::endl;
 	std::string str_path = "." + local_info.root;
 	std::string str;
 	if(local_info.index != "" && (str = readfile(str_path)).length() != 0)
@@ -262,13 +259,9 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 		response += "Content-Length: " + content_length_str + "\r\n";
 	response += "\r\n";
 	if(str != "")
-	{
 		response += str;
-	}
 	else
-	{
 		response += content;
-	}
 	return response;
 }
 
