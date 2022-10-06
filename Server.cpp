@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "response.hpp"
 
 server::server() {}
 server::~server() {}
@@ -197,12 +198,12 @@ void server::get_data_from_client(int i)
 			if (strlen(cgi.get_buffer().c_str()) != 0)
 				resp  = response(cgi.get_buffer());
 			else
-				resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
+				resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data,200);
 		}
 		else
 		{
 			serveInfo.locations[page.second].len  = content_length;
-			resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
+			resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data,405);
 		}
 }
 

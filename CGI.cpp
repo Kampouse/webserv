@@ -16,9 +16,7 @@ CGI::CGI(server_info info, std::pair<std::string, std::string> page, std::string
 	pos = data.find("Accept-Language: ");
 	pos = data.find("\r\n\r\n", pos);
 	pos += 4;
-
 	body = data.substr(pos);
-
 	setEnvVars();
 	setExecArgs();
 	execCGI();
