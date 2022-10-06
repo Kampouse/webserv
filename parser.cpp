@@ -118,11 +118,9 @@ void parser::manage_locations(std::vector<std::string>::iterator it)
 			cgi = data.substr(0, data.find_first_of(WHITESPACES));
 			root = data.substr(cgi.length(), std::string::npos);
 			root = trim(root);
-			std::cout << location;
 
 			servers.back().locations[location].cgi.insert(std::pair<std::string, std::string>(cgi, root));
 			std::string cgied =  servers.back().locations[location].cgi[root];
-			std::cout << cgied << std::endl;
 		}
 		else if (field == "index") {
 			servers.back().locations[location].index = data;

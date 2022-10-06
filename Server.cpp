@@ -144,9 +144,6 @@ void server::get_data_from_client(int i)
 		}
 	}
 
-	std::string tmp(buffer.begin(), buffer.end());
-	std::cout << tmp;
-
 	if(ret < 0){ 
 		std::cout << "recv error" << std::endl;
 		clear_fd(i);
@@ -178,9 +175,8 @@ void server::get_data_from_client(int i)
 		}
 		 
 		std::pair<std::string, std::string> page = find_page(data);
-		// std::cout << data;
-		if (page.first == "DELETE")// && 
-		// (this->serveInfo.locations["/"].find_allow_request("DELETE")  || this->serveInfo.locations["/"].allowed_requests.size() == 0) )
+		if (page.first == "DELETE"  && 
+		 (this->serveInfo.locations["/"].find_allow_request("DELETE")  || this->serveInfo.locations["/"].allowed_requests.size() == 0) )
 		{
 			
 			std::string upload_path;

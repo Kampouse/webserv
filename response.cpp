@@ -230,13 +230,10 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	}
 	else
 	{
-		std::cout << status_code  << std::endl;
 		content = local_info.find_error_page( error_page[status_code]);
 		content_length = content.length();
 		content_type = "text/html";
 	}
-
-	std::cout <<  local_info << std::endl;
 	std::string str_path = "." + local_info.root;
 	std::string str;
 	if(local_info.index != "" && (str = readfile(str_path)).length() != 0)
