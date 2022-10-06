@@ -37,6 +37,7 @@ struct location_info {
 		redirect_to = "";
 		redirect_code = 0;
 		client_max_body_size = 0;
+		root = "";
 	}
 	~location_info() {}
 
@@ -147,10 +148,10 @@ struct location_info {
 		std::string time_string = asctime(timeinfo);
 		time_string.erase(std::remove(time_string.begin(), time_string.end(), '\n'), time_string.end());
 		time_string.insert(time_string.find(' '), " - ");
-		os << "root: " << test.root << std::endl;
-		os << "index: " << test.index << std::endl;
-		os << "upload_dir: " << test.upload_dir << std::endl;
-		os << "autoindex: " << test.autoindex << std::endl;
+		// os << "root: " << test.root << std::endl;
+		// os << "index: " << test.index << std::endl;
+		// os << "upload_dir: " << test.upload_dir << std::endl;
+		// os << "autoindex: " << test.autoindex << std::endl;
 		std::map<std::string, std::string>::const_iterator it;
 		for (it = test.cgi.begin(); it != test.cgi.end(); it++) {
 			os << "cgi: " << it->first << " " << it->second << std::endl;

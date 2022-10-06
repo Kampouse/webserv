@@ -409,5 +409,4 @@ if (deleteBtn) {
 		alert("Upload Directory Deleted");
 		axios.delete("http://127.0.0.1:8081/upload").then(fn);
 	})
-	 
 }
