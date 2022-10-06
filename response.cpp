@@ -41,7 +41,7 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 	this->status = "200 OK";
 	this->status_code = 200;
 	std::string temp = path.substr(0, path.find(" "));
-	bool allowed = true ;
+	bool allowed = true;
 	for (size_t i = 0; i < local_info.allowed_requests.size(); i++)
 	{
 		if (local_info.allowed_requests[i] == temp)

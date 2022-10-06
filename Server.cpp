@@ -190,10 +190,9 @@ void server::get_data_from_client(int i)
 		{
 				upload(*this, page, data, content_length);
 		}
-		else if (page.second.find("cgi-bin") != std::string::npos && 
-		 (this->serveInfo.locations["/"].find_allow_request( page.first)  || this->serveInfo.locations["/"].allowed_requests.size() == 0) )
+		else if (page.second.find("cgi-bin") != std::string::npos)
 		{
-				CGI cgi(serveInfo, page, data);
+			CGI cgi(serveInfo, page, data);
 			if (strlen(cgi.get_buffer().c_str()) != 0)
 				resp  = response(cgi.get_buffer());
 			else

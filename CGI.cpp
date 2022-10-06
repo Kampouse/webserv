@@ -6,6 +6,7 @@ CGI::~CGI() {}
 CGI::CGI(server_info info, std::pair<std::string, std::string> page, std::string _data)
 {
 	serverInfo = info;
+	// info.locations["/"].allowed_requests
 	request = page.first;
 	data = _data;
 	size_t pos = page.second.find("?");
@@ -27,14 +28,10 @@ CGI::CGI(server_info info, std::pair<std::string, std::string> page, std::string
 std::string CGI::getExecPath()
 {
 	std::string scriptExt = scriptName.substr(scriptName.find('.'), std::string::npos);
-
-	std::map<std::string, location_info>::iterator it = serverInfo.locations.begin();
 	std::map<std::string, std::string>::iterator cgi_it;
-	for (; it != serverInfo.locations.end(); it++) {
-		if ((cgi_it = it->second.cgi.find(scriptExt)) != it->second.cgi.end()) {
-			return (cgi_it->second);
-		}
-	}
+
+	if ((cgi_it = serverInfo.locations["/"].cgi.find(scriptExt)) != serverInfo.locations["/"].cgi.end())
+		return (cgi_it->second);
 	std::cout << "Invalid File Extension\n";
 	return "";
 }
