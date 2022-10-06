@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "response.hpp"
+#include "filesystem"
 
 server::server() {}
 server::~server() {}
@@ -50,7 +51,7 @@ void server::delete_upload(std::string path)
 	int ret = 0;
 
 	d = opendir(path.c_str());
-	if (!d) {
+	if (d == nullptr) {
 		resp.set_status_code(404);
 		return ;
 	}
@@ -143,11 +144,13 @@ void server::get_data_from_client(int i)
 		}
 	}
 
+	std::string tmp(buffer.begin(), buffer.end());
+	std::cout << tmp;
+
 	if(ret < 0){ 
 		std::cout << "recv error" << std::endl;
 		clear_fd(i);
 		return; 
-
 	}
 	else if(ret == 0){ clear_fd(i); }
 	else
@@ -175,8 +178,11 @@ void server::get_data_from_client(int i)
 		}
 		 
 		std::pair<std::string, std::string> page = find_page(data);
-		if (data.find("DELETE") != std::string::npos)
+		// std::cout << data;
+		if (page.first == "DELETE")// && 
+		// (this->serveInfo.locations["/"].find_allow_request("DELETE")  || this->serveInfo.locations["/"].allowed_requests.size() == 0) )
 		{
+			
 			std::string upload_path;
 			std::map<std::string, location_info>::iterator it = serveInfo.locations.begin();
 			for (; it != serveInfo.locations.end(); it++) {
@@ -189,7 +195,7 @@ void server::get_data_from_client(int i)
 		}
 		else if (page.first == "POST" && page.second == "/upload")
 		{
-				upload(*this, page, data, content_length);
+			upload(*this, page, data, content_length);
 		}
 		else if (page.second.find("cgi-bin") != std::string::npos && 
 		 (this->serveInfo.locations["/"].find_allow_request( page.first)  || this->serveInfo.locations["/"].allowed_requests.size() == 0) )
