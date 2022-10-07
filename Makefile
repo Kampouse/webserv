@@ -28,8 +28,7 @@ clean:
 	    ${RM} ${OBJS}
 
 test: all 
-	./${NAME} & sleep  1 && http :9991  
-
+	./test.sh 
 fclean: clean
 	@${RM} ${NAME}
 	@${RM} ${NAME_TEST}

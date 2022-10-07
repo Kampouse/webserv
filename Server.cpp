@@ -213,6 +213,7 @@ void server::get_data_from_client(int i)
 			}
 			serveInfo.locations[page.second].len  = content_length;
 			resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data);
+
 		}
 	}
 }

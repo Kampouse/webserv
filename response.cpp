@@ -78,6 +78,11 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 		this->status = "301 Moved Permanently"; 
 		this->status_code = 301;
 	}
+	else if (local_info.index == "")
+	{
+		this->status = "403 Forbidden";
+		this->status_code = 403;
+	}
 	else if (local_info.root == "")
 	{
 		this->status = "404 Not Found";
@@ -277,6 +282,7 @@ void response::set_response(int status_code)
 	{
 		this->status_code = status_code;
 		this->status = "200 OK";
+
 	}
 	else if(status_code > 400 && status_code < 500)
 	{
@@ -290,6 +296,7 @@ void response::set_response(int status_code)
 	}
 	else
 	{
+
 		this->status_code = status_code;
 		status = "200 OK";
 	}
