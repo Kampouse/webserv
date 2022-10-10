@@ -78,16 +78,17 @@ response::response(location_info local_info, std::map<int, std::string> error_pa
 		this->status = "301 Moved Permanently"; 
 		this->status_code = 301;
 	}
-	else if (local_info.index == "")
-	{
-		this->status = "403 Forbidden";
-		this->status_code = 403;
-	}
 	else if (local_info.root == "")
 	{
 		this->status = "404 Not Found";
 		this->status_code = 404;
 	}
+	else if (local_info.index == "" && local_info.autoindex == false)
+	{
+		this->status = "403 Forbidden";
+		this->status_code = 403;
+	}
+	
 	else
 	{
 		this->status = "200 OK";
@@ -214,7 +215,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 		content_length = content.length();
 		content_type = "text/html";
 	}
-	else if(status_code == 200 && type == "")
+	else if((status_code == 200 && type == "") || local_info.autoindex == true)
 	{
 		content = local_info.find_content();
 		content_type = local_info.find_type();
