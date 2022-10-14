@@ -40,7 +40,6 @@ bool upload::delete_file()
 
 void upload::get_filename()
 {
-	struct stat s;
 
 	size_t pos = buffer.find("filename=\"");
 	if (pos != std::string::npos)
@@ -56,12 +55,15 @@ void upload::get_filename()
 				break ;
 			}
 		}
-
-		if (!(stat(path.c_str(), &s) == 0 && s.st_mode & S_IFDIR))
+		if (path == "")
+		{
+			path.assign("upload");
 			mkdir(path.c_str(), S_IRWXG | S_IRWXO | S_IRWXU);
-
-		path.append(filename);
+			path.append("/");
+			path.append(filename);
+		}
 	}
+
 }
 
 void upload::write_file(server &serv)
