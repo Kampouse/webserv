@@ -206,7 +206,10 @@ void parser::get_server_fields(void)
 
 				servers.back().host = data.substr(0, pos);
 				data = data.substr(pos + 1, std::string::npos);
+
 				servers.back().port = atoi(data.c_str());
+				if( servers.back().port < 1025 || servers.back().port > 65535)
+					throw Exceptions::InvalidFieldError("listen");
 			}
 			else if (field == "server_name") {
 				servers.back().server_names = data;

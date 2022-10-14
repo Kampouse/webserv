@@ -6,16 +6,13 @@ upload::~upload() {}
 upload::upload(server &serv, std::pair<std::string, std::string> page, std::string buf, unsigned int content_length)
 	: serverInfo(serv.serveInfo), rqst(page), buffer(buf), filename("")
 {
-	// content_length = 100000000;
 	struct stat s;
 	if (content_length > serverInfo.client_max_body_size)
 	{
 		serv.resp.set_status_code(413);
-		return ;
+		return;
 	}
-
 	get_filename();
-
 	if (stat(path.c_str(), &s) == 0)
 	{
 		if (!delete_file()){
@@ -23,7 +20,6 @@ upload::upload(server &serv, std::pair<std::string, std::string> page, std::stri
 			return ;
 		}
 	}
-
 	write_file(serv);
 	serv.resp = response("/upload");
 }
@@ -40,7 +36,7 @@ bool upload::delete_file()
 
 void upload::get_filename()
 {
-
+	 struct stat s; 
 	size_t pos = buffer.find("filename=\"");
 	if (pos != std::string::npos)
 	{
@@ -58,12 +54,12 @@ void upload::get_filename()
 		if (path == "")
 		{
 			path.assign("upload");
-			mkdir(path.c_str(), S_IRWXG | S_IRWXO | S_IRWXU);
+			if(stat(path.c_str(), &s) != 0)
+				mkdir(path.c_str(), S_IRWXG | S_IRWXO | S_IRWXU);
 			path.append("/");
 			path.append(filename);
 		}
 	}
-
 }
 
 void upload::write_file(server &serv)
