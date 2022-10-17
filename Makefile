@@ -1,43 +1,27 @@
-
-NAME = webserv 
-CC = g++
+NAME= webserv
+SRC_DIR := ./src
 FLAGS = -Wall -Werror -Wextra   --std=c++98 -g 
-
-SRCS = Exceptions.cpp main.cpp parser.cpp Server.cpp server_utils.cpp response.cpp CGI.cpp upload.cpp
-
-
-RM =  rm -rf
-
-.cpp.o:
-	@c++ ${FLAGS}  -c $< -o ${<:.cpp=.o}
-
-OBJS = ${SRCS:.cpp=.o}
-
-all: ${NAME}
-
-${NAME}:${OBJS} 
-		@${CC} ${OBJS} ${FLAGS} -o ${NAME}
-
-run:  all 
-	./${NAME} 
-	
+OBJ_DIR := ./obj
+SRC_FILES := ./src/Exceptions.cpp ./src/main.cpp ./src/parser.cpp ./src/Server.cpp ./src/server_utils.cpp ./src/response.cpp ./src/CGI.cpp ./src/upload.cpp
+OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
+all : $(OBJ_DIR) $(NAME)
+$(OBJ_DIR):
+	@mkdir -p $(OBJ_DIR)
+$(NAME): $(OBJ_FILES) 
+		g++ $(LDFLAGS) -o $@ $^
+run : $(NAME)
+		./$(NAME)
+re: fclean all
 
 val: all
 	valgrind  --leak-check=yes --track-origins=yes -s --trace-children=yes  ./${NAME}
-
 clean:
-	    ${RM} ${OBJS}
-
-test: all 
-	./${NAME} & sleep  1 && http :9991  
-
-fclean: clean
-	@${RM} ${NAME}
-	@${RM} ${NAME_TEST}
-
+		rm -rf $(OBJ_DIR)
 git:
-		@git add ${SRCS} Makefile Exceptions.hpp config_structs.hpp parser.hpp Server.hpp response.hpp CGI.hpp
+		git add $(SRC_FILES) Makefile 
+fclean: clean
+		rm -f webserv
 
-re: fclean all
-	
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+		g++  $(FLAGS) -c -o $@ $<
 .PHONY: clean fclean re all run git
