@@ -1,3 +1,4 @@
+
 NAME = webserv 
 CC = g++
 FLAGS = -Wall -Werror -Wextra   --std=c++98 -g 
@@ -28,7 +29,8 @@ clean:
 	    ${RM} ${OBJS}
 
 test: all 
-	./test.sh 
+	./${NAME} & sleep  1 && http :9991  
+
 fclean: clean
 	@${RM} ${NAME}
 	@${RM} ${NAME_TEST}
@@ -39,4 +41,3 @@ git:
 re: fclean all
 	
 .PHONY: clean fclean re all run git
-

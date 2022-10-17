@@ -2,7 +2,7 @@
 
 #include <map>
 #include <unistd.h>
-
+#include "sstream" 
 #include "Server.hpp"
 
 class server;
