@@ -197,6 +197,8 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	std::stringstream ss;
 	std::string content_type ;
 
+
+
 	if (status_code == 200 && this->content == "/upload")
 	{
 		content = readfile("./resources/success/upload_success.html");
@@ -218,6 +220,7 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 	else if((status_code == 200 && type == "") || local_info.autoindex == true)
 	{
 		content = local_info.find_content();
+
 		content_type = local_info.find_type();
 		if(content_type == "text/plain" && local_info.autoindex == true)
 			content = list_directory(content_type,content,content_length,local_info,lst_info);
@@ -226,8 +229,18 @@ std::string  response::build_response(std::map<std::string,location_info> &lst_i
 			content = local_info.find_error_page( error_page[status_code]);
 			content_type = "text/html";
 		}
+		else if (content_type == "text/html")
+		{
+				if (content.length() == 0)
+				{
+					status_code = 404;
+					content = local_info.find_error_page( error_page[status_code]);
+					content_type = "text/html";
+				}
+		}
 		content_length = content.length();
 	}
+
 	else if (status_code == 200 && type != "")
 	{
 		content = readfile(path);
