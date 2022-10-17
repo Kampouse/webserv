@@ -9,7 +9,7 @@ all : $(OBJ_DIR) $(NAME)
 $(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)
 $(NAME): $(OBJ_FILES) 
-		g++ $(LDFLAGS) -o $@ $^
+		g++ $(FLAGS) -Isrc  -o $@ $^
 run : $(NAME)
 		./$(NAME)
 re: fclean all
