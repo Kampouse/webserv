@@ -106,7 +106,7 @@ void CGI::execCGI() {
   int fd[2];
   int in;
   pid_t pid;
-  int status;
+  int status = 0;
 
   int fd_f = 0;
 
@@ -125,12 +125,24 @@ void CGI::execCGI() {
     close(in);
     close(fd[0]);
     close(fd[1]);
-    execve(args[0], args, envp);
-    exit(1);
-    std::cout << "execve failed\n";
+    if(execve(args[0], args, envp)) {
+      exit(1);
+    }
   } else {
-    waitpid(pid, &status, 0);
-    dup2(fd[0], in);
+      waitpid(pid, &status, 0);
+      dup2(fd[0], in);
+      if (status != 0) {
+      delete[] args[0];
+      delete[] args[1];
+      delete[] args;
+      for (size_t i = 0; i < env_size; i++)
+        delete[] envp[i];
+      delete[] envp;
+        return;
+        close(in);
+      close(fd[0]);
+      close(fd[1]);
+    }
 
     bzero(buffer, 100000);
     read(fd[0], buffer, 100000);
@@ -144,6 +156,7 @@ void CGI::execCGI() {
     for (size_t i = 0; i < env_size; i++)
       delete[] envp[i];
     delete[] envp;
+
   }
   close(in);
 }
