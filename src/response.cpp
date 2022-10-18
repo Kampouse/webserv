@@ -189,6 +189,16 @@ response::build_response(std::map<std::string, location_info> &lst_info) {
     content_type = "text/html";
   } else if (status_code != 200) {
     content = local_info.find_error_page(error_page[status_code]);
+    /*
+    if (content == "") {
+      content = "<!DOCTYPE html><html><head><title>" + status +
+
+                "</title></head><body><h1>" + status +
+                	"</h1> <img  width=500 height=500 src=\"https://images.nightcafe.studio/jobs/gSfqoxufQvOM3TxCsPqr/gSfqoxufQvOM3TxCsPqr--3--7z5s8.jpg?tr=w-640,c-at_max\"> \
+                   <h1> a rat ate your error page sorry </h1>  </body></html>";
+
+    }
+*/
     content_length = content.length();
     content_type = "text/html";
   } else if ((status_code == 200 && type == "") ||

@@ -63,7 +63,7 @@ struct location_info {
     return (false);
   }
 
-  std::string find_error_page(std::string path) const {
+    std::string find_error_page(std::string path) const {
     std::string data;
     std::ifstream file(path.c_str());
     std::string line;
@@ -71,12 +71,17 @@ struct location_info {
     while (std::getline(file, line)) {
       data += line;
     }
-
     file.close();
+    if (data == "")
+      {
+          return("<!DOCTYPE html><html><head><title>" + path +
+          "</title></head><body><h1>" + path +
+          "</h1> <img  width=500 height=500 src=\"https://images.nightcafe.studio/jobs/gSfqoxufQvOM3TxCsPqr/gSfqoxufQvOM3TxCsPqr--3--7z5s8.jpg?tr=w-640,c-at_max\"> \
+            <h1> a rat ate your error page sorry </h1>  </body></html>");
+      }
     return data;
   }
-
-  std::string find_content() const {
+    std::string find_content() const {
     std::string data;
     std::string file_path = root + "/" + index;
     std::ifstream file(file_path.c_str());
