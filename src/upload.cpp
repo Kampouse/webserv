@@ -48,12 +48,13 @@ void upload::get_filename() {
       }
     }
     if (path == "") {
-      path.assign("upload");
-      if (stat(path.c_str(), &s) != 0)
-        mkdir(path.c_str(), S_IRWXG | S_IRWXO | S_IRWXU);
-      path.append("/");
-      path.append(filename);
+        path.assign("./upload/");
     }
+    if (stat(path.c_str(), &s) != 0)
+      mkdir(path.c_str(), S_IRWXG | S_IRWXO | S_IRWXU);
+      path.append(filename);
+
+
   }
 }
 

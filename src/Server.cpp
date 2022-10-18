@@ -39,11 +39,15 @@ void server::delete_upload(std::string path) {
   std::string file;
   struct stat s;
   int ret = 0;
+  std::cout << "delete_upload" << std::endl;
+   resp = response();
 
   d = opendir(path.c_str());
   if (d == nullptr) {
-    resp.set_status_code(404);
-    return;
+    d = opendir("./upload");
+    if(d == nullptr)
+      return;
+    path = "./upload";
   }
   while ((dir = readdir(d))) {
     file.clear();
@@ -63,8 +67,12 @@ void server::delete_upload(std::string path) {
     if (ret < 0)
       std::cout << "Deleting error:" << errno << "\n";
   }
+  resp.set_status_code(200);
+  resp.set_status("200 OK");
+  std::cout << "delete_upload end" << std::endl;
   rmdir(path.c_str());
   closedir(d);
+
 }
 
 void server::get_content_length(std::string buf) {
@@ -183,7 +191,6 @@ void server::get_data_from_client(int i) {
         resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data); 
               resp.set_status_code(500);
               resp.set_status("500 Internal Server Error");
-
       }
     } else {
       if (page.second.find("cgi-bin") != std::string::npos &&
@@ -204,6 +211,7 @@ void server::get_data_from_client(int i) {
 
 void server::get_data_from_server(int i) {
   std::string http_response = resp.build_response(serveInfo.locations);
+  std::cout << http_response << std::endl;
   int ret = send(poll_set[i].fd, http_response.c_str(), http_response.length(), 0);
   if (ret < 0) {
     std::cout << "Error sending response\n" << std::endl;

@@ -180,7 +180,9 @@ response::build_response(std::map<std::string, location_info> &lst_info) {
   std::string content_type;
 
   if (status_code == 200 && this->content == "/upload") {
-    content = "<!DOCTYPE html> <html> <head> <title>Upload successfully completed</title> </head>  <body>	<img src=\"/images/done.jpeg\" alt=\"Upload done\"> 	<h1>Upload successfully completed!</h1>  </body> </html>";
+    content = "<!DOCTYPE html> <html> <head> <title>Upload successfully completed</title> </head>  <body>	\
+    <img src=\"/images/done.jpeg\" alt=\"Upload done\"> 	 \
+    <h1>Upload successfully completed!</h1>  </body> </html>";
 
     content_length = content.length();
     content_type = "text/html";
@@ -234,7 +236,8 @@ response::build_response(std::map<std::string, location_info> &lst_info) {
   time(&rawtime);
   timeinfo = localtime(&rawtime);
   strftime(time_string, 80, "%a, %b %d %H:%M:%S %Y", timeinfo);
-
+  if(status == "")
+    status = "200 OK";
   std::string response = "HTTP/1.1 " + status + "\r\n";
   response += "Date: " + std::string(time_string) + "\r\n";
 
