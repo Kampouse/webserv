@@ -1,4 +1,3 @@
-#!/usr/bin/python
 
 # https://www.geeksforgeeks.org/what-is-cgi-in-python/
 
