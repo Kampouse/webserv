@@ -182,6 +182,8 @@ void server::get_data_from_client(int i) {
       {
         resp = response(serveInfo.locations[page.second],this->serveInfo.error_pages, data); 
               resp.set_status_code(500);
+              resp.set_status("500 Internal Server Error");
+
       }
     } else {
       if (page.second.find("cgi-bin") != std::string::npos &&
