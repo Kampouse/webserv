@@ -80,12 +80,11 @@ void upload::write_file(server &serv) {
       pos += len + 1;
     else {
       pos = ptr - str + 1;
-      if (memcmp(ptr, boundary.c_str(), strlen(boundary.c_str())) == 0) {
+      if (memcmp(ptr, boundary.c_str(), boundary.size()) == 0) {
         break;
       }
     }
   }
-  size_t length = pos - start - 3;
-  ofs.write(&buffer[start], length);
+  ofs.write(&buffer[start], buffer.size());
   ofs.close();
 }
