@@ -42,6 +42,9 @@ void server::delete_upload(std::string path) {
    resp = response();
 
   d = opendir(path.c_str());
+  // protect  path traversal
+  if( d == NULL || path.find("..") != std::string::npos)
+    return;
   if (d == nullptr || path == "/") {
     d = opendir("./upload");
     if(d == nullptr)
