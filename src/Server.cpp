@@ -42,7 +42,7 @@ void server::delete_upload(std::string path) {
    resp = response();
 
   d = opendir(path.c_str());
-  if (d == nullptr) {
+  if (d == nullptr || path == "/") {
     d = opendir("./upload");
     if(d == nullptr)
       return;
@@ -64,10 +64,17 @@ void server::delete_upload(std::string path) {
     } else
       ret = unlink(file.c_str());
     if (ret < 0)
+    {
       std::cout << "Deleting error:" << errno << "\n";
+      resp.set_status_code(500);
+      resp.set_status("500 Internal Server Error");
+      return;
+
+    }
   }
   resp.set_status_code(200);
   resp.set_status("200 OK");
+
   rmdir(path.c_str());
   closedir(d);
 

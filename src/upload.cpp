@@ -47,7 +47,8 @@ void upload::get_filename() {
         break;
       }
     }
-    if (path == "") {
+    if (path == "" || path == "/") {
+      std::cout << "No upload directory found" << std::endl;
         path.assign("./upload/");
     }
     if (stat(path.c_str(), &s) != 0)
