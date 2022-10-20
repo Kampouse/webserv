@@ -72,13 +72,6 @@ struct location_info {
       data += line;
     }
     file.close();
-    if (data == "")
-      {
-          return("<!DOCTYPE html><html><head><title>" + path +
-          "</title></head><body><h1>" + path +
-          "</h1> <img  width=500 height=500 src=\"https://images.nightcafe.studio/jobs/gSfqoxufQvOM3TxCsPqr/gSfqoxufQvOM3TxCsPqr--3--7z5s8.jpg?tr=w-640,c-at_max\"> \
-            <h1> a rat ate your error page sorry </h1>  </body></html>");
-      }
     return data;
   }
     std::string find_content() const {
@@ -136,10 +129,6 @@ struct location_info {
     time_string.erase(std::remove(time_string.begin(), time_string.end(), '\n'),
                       time_string.end());
     time_string.insert(time_string.find(' '), " - ");
-    // os << "root: " << test.root << std::endl;
-    // os << "index: " << test.index << std::endl;
-    // os << "upload_dir: " << test.upload_dir << std::endl;
-    // os << "autoindex: " << test.autoindex << std::endl;
     std::map<std::string, std::string>::const_iterator it;
     for (it = test.cgi.begin(); it != test.cgi.end(); it++) {
       os << "cgi: " << it->first << " " << it->second << std::endl;
